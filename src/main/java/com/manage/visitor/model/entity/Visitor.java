@@ -1,5 +1,7 @@
 package com.manage.visitor.model.entity;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,4 +22,7 @@ public class Visitor {
 
   private String name;
   private String surname;
+
+  @OneToMany(mappedBy = "visitor")
+  private List<WorkerVisitor> workers;
 }

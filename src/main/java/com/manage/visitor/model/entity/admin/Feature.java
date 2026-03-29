@@ -20,6 +20,6 @@ public class Feature {
 
   private String label;
   private String code;
-  private Boolean isKeyFeature;
-  private String urlKeyFeature;
+  private Integer idKey;
+  private String url;
 }

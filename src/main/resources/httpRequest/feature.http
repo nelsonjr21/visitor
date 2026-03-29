@@ -1,0 +1,36 @@
+###
+POST {{host}}:{{port}}/api/features
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+  "label": "Administrations",
+  "code": "ADMINISTRATIONsss",
+  "isKeyFeature": true,
+  "urlKeyFeature": "/administration"
+}
+
+###
+GET {{host}}:{{port}}/api/features
+Authorization: {{token}}
+
+###
+GET {{host}}:{{port}}/api/features/1
+Authorization: {{token}}
+
+###
+PUT {{host}}:{{port}}/api/features
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+  "id": 1,
+  "label": "Administration",
+  "code": "ADMINISTRATION",
+  "isKeyFeature": true,
+  "urlKeyFeature": "/administration"
+}
+
+###
+DELETE {{host}}:{{port}}/api/features/3
+Authorization: {{token}}

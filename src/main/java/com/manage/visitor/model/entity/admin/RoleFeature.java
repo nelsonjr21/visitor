@@ -18,14 +18,13 @@ public class RoleFeature {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  private String urlFeature;
-  private Boolean stateFeature;
+  private Boolean state;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne
   @JoinColumn(name = "roleId")
   private Role role;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne
   @JoinColumn(name = "featureId")
   private Feature feature;
 }

@@ -1,0 +1,32 @@
+###
+POST {{host}}:{{port}}/api/roles
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+  "label": "Super administrateur",
+  "code": "SUPERADMIN"
+}
+
+###
+GET {{host}}:{{port}}/api/roles
+Authorization: {{token}}
+
+###
+GET {{host}}:{{port}}/api/roles/3
+Authorization: {{token}}
+
+###
+PUT {{host}}:{{port}}/api/roles
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+  "id": 3,
+  "label": "Super administrateur",
+  "code": "SUPER_ADMIN"
+}
+
+###
+DELETE {{host}}:{{port}}/api/roles/3
+Authorization: {{token}}

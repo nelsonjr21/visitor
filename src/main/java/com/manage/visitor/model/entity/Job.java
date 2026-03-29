@@ -1,5 +1,7 @@
 package com.manage.visitor.model.entity;
 
+import java.util.Set;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,4 +22,7 @@ public class Job {
 
   private String label;
   private Integer keyJobId;
+
+  @OneToMany(mappedBy = "job", fetch = FetchType.LAZY)
+  private Set<Worker> workers;
 }

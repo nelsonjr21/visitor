@@ -1,0 +1,32 @@
+###
+POST {{host}}:{{port}}/api/jobs
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+  "label": "Direteur",
+  "keyJobId": 5
+}
+
+###
+GET {{host}}:{{port}}/api/jobs
+Authorization: {{token}}
+
+###
+GET {{host}}:{{port}}/api/jobs/12
+Authorization: {{token}}
+
+###
+PUT {{host}}:{{port}}/api/jobs
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+  "id": 12,
+  "label": "Sous-directeur",
+  "keyJobId": 4
+}
+
+###
+DELETE {{host}}:{{port}}/api/jobs/11
+Authorization: {{token}}

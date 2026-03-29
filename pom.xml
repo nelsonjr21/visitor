@@ -55,6 +55,29 @@
 			<artifactId>spring-boot-starter-tomcat</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		<!-- for security -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<!-- jwt -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-api</artifactId>
+			<version>0.11.5</version>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-impl</artifactId>
+			<version>0.11.5</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-jackson</artifactId>
+			<version>0.11.5</version>
+			<scope>runtime</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -88,15 +111,19 @@
 						</importOrder>
 					</java>
 				</configuration>
-				<!--run sptoless during build-->
-				<!--<executions>
+				<!--
+					run sptoless during build
+ 					mvn spotless:check
+ 					mvn spotless:apply
+				-->
+				<executions>
 					<execution>
 						<goals>
 							<goal>check</goal>
 						</goals>
 						<phase>compile</phase>
 					</execution>
-				</executions>-->
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

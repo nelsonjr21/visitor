@@ -22,11 +22,11 @@ public class WorkerVisitor {
 
   private LocalDateTime visitDate;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne
   @JoinColumn(name = "workerId")
   private Worker worker;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne
   @JoinColumn(name = "visitorId")
   private Visitor visitor;
 }

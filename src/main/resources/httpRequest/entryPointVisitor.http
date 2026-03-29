@@ -1,0 +1,8 @@
+###
+POST {{host}}:{{port}}/api/workers/login
+Content-Type: application/json
+
+{
+  "username": "LOUP2001",
+  "password": "010901"
+}

@@ -1,0 +1,60 @@
+###
+POST {{host}}:{{port}}/api/workers/register
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+  "name": "koffié",
+  "surname": "kanjj kouddame",
+  "birthDate": "2004-05-01",
+  "identifier": "KOFFP2004",
+  "password": "010901",
+  "roleList": [
+    {
+      "id": 1
+    }
+  ],
+  "job": {
+    "id" : 8
+  }
+}
+
+###
+GET {{host}}:{{port}}/api/workers
+Authorization: {{token}}
+
+###
+GET {{host}}:{{port}}/api/workers/4
+Authorization: {{token}}
+
+###
+PUT {{host}}:{{port}}/api/workers
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+  "id": 2,
+  "name": "loukouri",
+  "surname": "nelson",
+  "birthDate": "2001-05-01",
+  "identifier": "LOUP2001",
+  "password": "010901",
+  "roleList": [
+    {
+      "id": 2
+    },
+    {
+      "id": 1
+    },
+    {
+      "id": 3
+    }
+  ],
+  "job": {
+    "id" : 8
+  }
+}
+
+###
+DELETE {{host}}:{{port}}/api/workers/5
+Authorization: {{token}}
