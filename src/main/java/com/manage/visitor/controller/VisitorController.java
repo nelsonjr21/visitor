@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.manage.visitor.helpers.http.ApiResponse;
 import com.manage.visitor.model.dto.VisitorDto;
-import com.manage.visitor.model.mapper.VisitorMapper;
 import com.manage.visitor.service.VisitorService;
 
 import lombok.RequiredArgsConstructor;
@@ -21,34 +20,29 @@ import lombok.extern.slf4j.Slf4j;
 public class VisitorController {
 
   private final VisitorService service;
-  private final VisitorMapper mapper;
 
   @PostMapping
   public ResponseEntity<ApiResponse<VisitorDto>> save(@RequestBody VisitorDto dto) {
     log.info("HTTP POST /visitors body={}", dto);
-    return new ResponseEntity<>(
-        ApiResponse.success(mapper.toDto(service.save(mapper.toEntity(dto)))), HttpStatus.OK);
+    return new ResponseEntity<>(ApiResponse.success(service.save(dto)), HttpStatus.OK);
   }
 
   @GetMapping
   public ResponseEntity<ApiResponse<List<VisitorDto>>> getAll() {
     log.info("HTTP GET /visitors");
-    return new ResponseEntity<>(
-        ApiResponse.success(service.getAll().stream().map(mapper::toDto).toList()), HttpStatus.OK);
+    return new ResponseEntity<>(ApiResponse.success(service.getAll()), HttpStatus.OK);
   }
 
   @GetMapping("/{id}")
   public ResponseEntity<ApiResponse<VisitorDto>> getById(@PathVariable Integer id) {
     log.info("HTTP GET /visitors/{}", id);
-    return new ResponseEntity<>(
-        ApiResponse.success(mapper.toDto(service.getById(id))), HttpStatus.OK);
+    return new ResponseEntity<>(ApiResponse.success(service.getById(id)), HttpStatus.OK);
   }
 
   @PutMapping
   public ResponseEntity<ApiResponse<VisitorDto>> update(@RequestBody VisitorDto dto) {
     log.info("HTTP PUT /visitors body={}", dto);
-    return new ResponseEntity<>(
-        ApiResponse.success(mapper.toDto(service.update(mapper.toEntity(dto)))), HttpStatus.OK);
+    return new ResponseEntity<>(ApiResponse.success(service.update(dto)), HttpStatus.OK);
   }
 
   @DeleteMapping("/{id}")

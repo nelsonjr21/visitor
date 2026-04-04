@@ -38,16 +38,16 @@ public class FeatureService {
   @Transactional
   public FeatureDto save(FeatureDto dto) {
     log.info("save feature");
-    Feature data = FeatureDto.toEntity(dto);
-    if (data.getIdKey() != null) {
+    if (dto.idKey() != null) {
       // 1.
-      if (!featureRepository.existsByIdKey(data.getIdKey())) {
+      if (!featureRepository.existsByIdKey(dto.idKey())) {
         throw new BadRequestException("feature key not existing");
       }
     }
 
     try {
-      if (data.getId() == null) {
+      if (dto.id() == null) {
+        Feature data = new Feature(dto); // convert dto to entity for saving
         // saved
         Feature f = featureRepository.save(data);
         // 2.
@@ -65,7 +65,7 @@ public class FeatureService {
                         new Feature(f.getId(), null, null, null, null)));
               });
         }
-        return FeatureDto.entityToDTO(f);
+        return new FeatureDto(f);
       }
     } catch (Exception e) {
       log.error("save feature failed: ", e);
@@ -77,7 +77,7 @@ public class FeatureService {
   public List<FeatureDto> getAll() {
     log.info("loading feature");
     try {
-      return featureRepository.findAll().stream().map(FeatureDto::entityToDTO).toList();
+      return featureRepository.findAll().stream().map(FeatureDto::new).toList();
     } catch (Exception e) {
       log.error("loading feature failed: ", e);
       throw new AppException(e.getMessage());
@@ -87,9 +87,7 @@ public class FeatureService {
   public List<FeatureDto> getAllKeyFeature() {
     log.info("loading key feature");
     try {
-      return featureRepository.findByIdKeyIsNotNull().stream()
-          .map(FeatureDto::entityToDTO)
-          .toList();
+      return featureRepository.findByIdKeyIsNotNull().stream().map(FeatureDto::new).toList();
     } catch (Exception e) {
       log.error("loading key feature failed: ", e);
       throw new AppException(e.getMessage());
@@ -130,7 +128,7 @@ public class FeatureService {
     try {
       Optional<Feature> data = featureRepository.findById(id);
       if (data.isPresent()) {
-        return FeatureDto.entityToDTO(data.get());
+        return new FeatureDto(data.get());
       }
     } catch (Exception e) {
       log.error("loading Feature failed : ", e);
@@ -141,19 +139,18 @@ public class FeatureService {
 
   public FeatureDto update(FeatureDto dto) {
     log.info("update feature");
-    Feature data = FeatureDto.toEntity(dto);
-    if (data.getId() == null) {
+    if (dto.id() == null) {
       throw new BadRequestException(Message.ID_REQUIRED.getText());
     }
     try {
-      Optional<Feature> d = featureRepository.findById(data.getId());
+      Optional<Feature> d = featureRepository.findById(dto.id());
       if (d.isPresent()) {
         Feature existing = d.get();
-        existing.setLabel(data.getLabel());
-        existing.setCode(data.getCode());
-        existing.setIdKey(data.getIdKey());
-        existing.setUrl(data.getUrl());
-        return FeatureDto.entityToDTO(featureRepository.save(data));
+        existing.setLabel(dto.label());
+        existing.setCode(dto.code());
+        existing.setIdKey(dto.idKey());
+        existing.setUrl(dto.url());
+        return new FeatureDto(featureRepository.save(existing));
       }
     } catch (Exception e) {
       log.error("update feature failed: ", e);
@@ -194,8 +191,8 @@ public class FeatureService {
                                   new Feature(x.id(), null, null, null, null))));
                 });
         if (!toSave.isEmpty()) {
-          log.info("save state ok");
           roleFeatureRepository.saveAll(toSave);
+          log.info("save state ok");
         }
       }
     } catch (Exception e) {

@@ -26,9 +26,8 @@ public class RoleService {
   public RoleDto save(RoleDto dto) {
     log.info("save role");
     try {
-      Role data = RoleDto.toEntity(dto);
-      if (data.getId() == null) {
-        return RoleDto.entityToDTO(repository.save(data));
+      if (dto.id() == null) {
+        return new RoleDto(repository.save(new Role(dto)));
       }
     } catch (Exception e) {
       log.error("save role failed: ", e);
@@ -40,7 +39,7 @@ public class RoleService {
   public List<RoleDto> getAll() {
     log.info("loading role");
     try {
-      return repository.findAll().stream().map(RoleDto::entityToDTO).toList();
+      return repository.findAll().stream().map(RoleDto::new).toList();
     } catch (Exception e) {
       log.error("loading role failed: ", e);
       throw new AppException(e.getMessage());
@@ -52,7 +51,7 @@ public class RoleService {
     try {
       Optional<Role> data = repository.findById(id);
       if (data.isPresent()) {
-        return RoleDto.entityToDTO(data.get());
+        return new RoleDto(data.get());
       }
     } catch (Exception e) {
       log.error("loading role failed : ", e);
@@ -63,17 +62,16 @@ public class RoleService {
 
   public RoleDto update(RoleDto dto) {
     log.info("update role");
-    Role data = RoleDto.toEntity(dto);
-    if (data.getId() == null) {
+    if (dto.id() == null) {
       throw new BadRequestException(Message.ID_REQUIRED.getText());
     }
     try {
-      Optional<Role> d = repository.findById(data.getId());
+      Optional<Role> d = repository.findById(dto.id());
       if (d.isPresent()) {
         Role existing = d.get();
-        existing.setLabel(data.getLabel());
-        existing.setCode(data.getCode());
-        return RoleDto.entityToDTO(repository.save(data));
+        existing.setLabel(dto.label());
+        existing.setCode(dto.code());
+        return new RoleDto(repository.save(existing));
       }
     } catch (Exception e) {
       log.error("update roleList failed: ", e);

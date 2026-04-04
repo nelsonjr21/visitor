@@ -45,7 +45,7 @@ public class WorkerService {
   public WorkerDto save(WorkerDto dto) {
     log.info("save worker");
     try {
-      Worker data = WorkerDto.toEntity(dto, JobDto.toEntity(dto.job()));
+      Worker data = new Worker(dto);
       if (data.getId() == null) {
         if (repository.findByIdentifier(data.getIdentifier()) != null) {
           throw new BadRequestException("Username already exists");
@@ -63,7 +63,7 @@ public class WorkerService {
                           new Role(x.id(), null, null),
                           new Worker(saved.getId(), null, null, null, null, null, null)));
                 });
-        return WorkerDto.result(saved, null, null);
+        return new WorkerDto(saved, null, null);
       }
     } catch (Exception e) {
       log.error("save worker failed: ", e);
@@ -80,12 +80,12 @@ public class WorkerService {
           .isAuthenticated()) {
         String token = jwtUtils.generateToken(user.username());
         Worker data = repository.findByIdentifier(user.username());
-        return WorkerDto.forLogin(
+        return new WorkerDto(
             data,
             roleWorkerRepository.findByWorker_Id(data.getId()).stream()
-                .map(y -> RoleDto.entityToDTO(y.getRole()))
+                .map(y -> new RoleDto(y.getRole()))
                 .toList(),
-            jobRepository.findById(data.getJob().getId()).map(JobDto::convertToDto).orElse(null),
+            jobRepository.findById(data.getJob().getId()).map(JobDto::new).orElse(null),
             token);
       }
     } catch (BadCredentialsException e) {
@@ -104,14 +104,11 @@ public class WorkerService {
       return repository.findAll().stream()
           .map(
               x ->
-                  WorkerDto.result(
+                  new WorkerDto(
                       x,
-                      jobRepository
-                          .findById(x.getJob().getId())
-                          .map(JobDto::convertToDto)
-                          .orElse(null),
+                      jobRepository.findById(x.getJob().getId()).map(JobDto::new).orElse(null),
                       roleWorkerRepository.findByWorker_Id(x.getId()).stream()
-                          .map(y -> RoleDto.entityToDTO(y.getRole()))
+                          .map(y -> new RoleDto(y.getRole()))
                           .toList()))
           .toList();
     } catch (Exception e) {
@@ -125,14 +122,11 @@ public class WorkerService {
     try {
       Optional<Worker> data = repository.findById(id);
       if (data.isPresent()) {
-        return WorkerDto.result(
+        return new WorkerDto(
             data.get(),
-            jobRepository
-                .findById(data.get().getJob().getId())
-                .map(JobDto::convertToDto)
-                .orElse(null),
+            jobRepository.findById(data.get().getJob().getId()).map(JobDto::new).orElse(null),
             roleWorkerRepository.findByWorker_Id(data.get().getId()).stream()
-                .map(y -> RoleDto.entityToDTO(y.getRole()))
+                .map(y -> new RoleDto(y.getRole()))
                 .toList());
       }
     } catch (Exception e) {
@@ -145,7 +139,7 @@ public class WorkerService {
   @Transactional
   public WorkerDto update(WorkerDto dto) {
     log.info("update worker");
-    Worker data = WorkerDto.toEntity(dto, JobDto.toEntity(dto.job()));
+    Worker data = new Worker(dto);
     if (data.getId() == null) {
       throw new BadRequestException(Message.ID_REQUIRED.getText());
     }
@@ -168,7 +162,7 @@ public class WorkerService {
                         new RoleWorker(null, new Role(x.id(), null, null), existing));
                   }
                 });
-        return WorkerDto.result(existing, null, null);
+        return new WorkerDto(existing, null, null);
       }
     } catch (Exception e) {
       log.error("update worker failed: ", e);

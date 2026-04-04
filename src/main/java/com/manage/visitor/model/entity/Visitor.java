@@ -2,6 +2,8 @@ package com.manage.visitor.model.entity;
 
 import java.util.List;
 
+import com.manage.visitor.model.dto.VisitorDto;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,4 +27,10 @@ public class Visitor {
 
   @OneToMany(mappedBy = "visitor")
   private List<WorkerVisitor> workers;
+
+  public Visitor(VisitorDto dto) {
+    id = dto.id();
+    name = dto.name();
+    surname = dto.surname();
+  }
 }

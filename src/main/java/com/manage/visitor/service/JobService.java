@@ -26,9 +26,8 @@ public class JobService {
   public JobDto save(JobDto dto) {
     log.info("save job");
     try {
-      Job data = JobDto.toEntity(dto);
-      if (data.getId() == null) {
-        return JobDto.convertToDto(repository.save(data));
+      if (dto.id() == null) {
+        return new JobDto(repository.save(new Job(dto)));
       }
     } catch (Exception e) {
       log.error("save job failed: ", e);
@@ -40,7 +39,7 @@ public class JobService {
   public List<JobDto> getAll() {
     log.info("loading job");
     try {
-      return repository.findAll().stream().map(JobDto::convertToDto).toList();
+      return repository.findAll().stream().map(JobDto::new).toList();
     } catch (Exception e) {
       log.error("loading job failed: ", e);
       throw new AppException(e.getMessage());
@@ -52,7 +51,7 @@ public class JobService {
     try {
       Optional<Job> data = repository.findById(id);
       if (data.isPresent()) {
-        return JobDto.convertToDto(data.get());
+        return new JobDto(data.get());
       }
     } catch (Exception e) {
       log.error("loading Job failed : ", e);
@@ -63,17 +62,16 @@ public class JobService {
 
   public JobDto update(JobDto dto) {
     log.info("update job");
-    Job data = JobDto.toEntity(dto);
-    if (data.getId() == null) {
+    if (dto.id() == null) {
       throw new BadRequestException(Message.ID_REQUIRED.getText());
     }
     try {
-      Optional<Job> d = repository.findById(data.getId());
+      Optional<Job> d = repository.findById(dto.id());
       if (d.isPresent()) {
         Job existing = d.get();
-        existing.setLabel(data.getLabel());
-        existing.setKeyJobId(data.getKeyJobId());
-        return JobDto.convertToDto(repository.save(existing));
+        existing.setLabel(dto.label());
+        existing.setKeyJobId(dto.keyJobId());
+        return new JobDto(repository.save(existing));
       }
     } catch (Exception e) {
       log.error("update job failed: ", e);

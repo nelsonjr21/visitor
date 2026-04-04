@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
+import com.manage.visitor.model.dto.WorkerDto;
 import com.manage.visitor.model.entity.admin.RoleWorker;
 
 import jakarta.persistence.*;
@@ -55,5 +56,15 @@ public class Worker {
     this.identifier = identifier;
     this.pw = pw;
     this.job = job;
+  }
+
+  public Worker(WorkerDto dto) {
+    this.id = dto.id();
+    this.name = dto.name();
+    this.surname = dto.surname();
+    this.birthDate = dto.birthDate();
+    this.identifier = dto.identifier();
+    this.pw = dto.password();
+    this.job = new Job(dto.job());
   }
 }

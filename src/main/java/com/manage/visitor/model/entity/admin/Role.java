@@ -1,5 +1,7 @@
 package com.manage.visitor.model.entity.admin;
 
+import com.manage.visitor.model.dto.admin.RoleDto;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,4 +22,10 @@ public class Role {
 
   private String label;
   private String code;
+
+  public Role(RoleDto dto) {
+    this.id = dto.id();
+    this.label = dto.label();
+    this.code = dto.code();
+  }
 }

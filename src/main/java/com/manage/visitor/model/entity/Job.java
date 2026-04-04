@@ -2,6 +2,8 @@ package com.manage.visitor.model.entity;
 
 import java.util.Set;
 
+import com.manage.visitor.model.dto.JobDto;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,4 +27,10 @@ public class Job {
 
   @OneToMany(mappedBy = "job", fetch = FetchType.LAZY)
   private Set<Worker> workers;
+
+  public Job(JobDto dto) {
+    this.id = dto.id();
+    this.label = dto.label();
+    this.keyJobId = dto.keyJobId();
+  }
 }

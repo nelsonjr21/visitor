@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.manage.visitor.model.dto.admin.RoleDto;
-import com.manage.visitor.model.entity.Job;
 import com.manage.visitor.model.entity.Worker;
 
 public record WorkerDto(
@@ -18,9 +17,8 @@ public record WorkerDto(
     List<RoleDto> roleList,
     JobDto job,
     @JsonInclude(JsonInclude.Include.NON_NULL) String token) {
-  public static WorkerDto forLogin(
-      Worker data, List<RoleDto> roleDtoList, JobDto jobDto, String token) {
-    return new WorkerDto(
+  public WorkerDto(Worker data, List<RoleDto> roleDtoList, JobDto jobDto, String token) {
+    this(
         data.getId(),
         data.getName(),
         data.getSurname(),
@@ -32,8 +30,8 @@ public record WorkerDto(
         token);
   }
 
-  public static WorkerDto result(Worker data, JobDto jobDto, List<RoleDto> roleDtoList) {
-    return new WorkerDto(
+  public WorkerDto(Worker data, JobDto jobDto, List<RoleDto> roleDtoList) {
+    this(
         data.getId(),
         data.getName(),
         data.getSurname(),
@@ -43,16 +41,5 @@ public record WorkerDto(
         roleDtoList,
         jobDto,
         null);
-  }
-
-  public static Worker toEntity(WorkerDto dto, Job job) {
-    return new Worker(
-        dto.id(),
-        dto.name(),
-        dto.surname(),
-        dto.birthDate(),
-        dto.identifier(),
-        dto.password(),
-        job);
   }
 }
