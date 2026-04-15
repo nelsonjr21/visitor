@@ -3,6 +3,7 @@ package com.manage.visitor.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.manage.visitor.model.mapper.JobMapper;
 import org.springframework.stereotype.Service;
 
 import com.manage.visitor.helpers.exception.AppException;
@@ -22,12 +23,13 @@ import lombok.extern.slf4j.Slf4j;
 public class JobService {
 
   private final JobRepository repository;
+  private final JobMapper jobMapper;
 
   public JobDto save(JobDto dto) {
     log.info("save job");
     try {
       if (dto.id() == null) {
-        return new JobDto(repository.save(new Job(dto)));
+        return jobMapper.toDto(repository.save(jobMapper.toEntity(dto)));
       }
     } catch (Exception e) {
       log.error("save job failed: ", e);
@@ -39,7 +41,7 @@ public class JobService {
   public List<JobDto> getAll() {
     log.info("loading job");
     try {
-      return repository.findAll().stream().map(JobDto::new).toList();
+      return repository.findAll().stream().map(jobMapper::toDto).toList();
     } catch (Exception e) {
       log.error("loading job failed: ", e);
       throw new AppException(e.getMessage());
@@ -51,7 +53,7 @@ public class JobService {
     try {
       Optional<Job> data = repository.findById(id);
       if (data.isPresent()) {
-        return new JobDto(data.get());
+        return jobMapper.toDto(data.get());
       }
     } catch (Exception e) {
       log.error("loading Job failed : ", e);
@@ -71,7 +73,7 @@ public class JobService {
         Job existing = d.get();
         existing.setLabel(dto.label());
         existing.setKeyJobId(dto.keyJobId());
-        return new JobDto(repository.save(existing));
+        return jobMapper.toDto(repository.save(jobMapper.toEntity(dto)));
       }
     } catch (Exception e) {
       log.error("update job failed: ", e);

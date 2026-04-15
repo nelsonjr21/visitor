@@ -23,9 +23,7 @@ public class Role {
   private String label;
   private String code;
 
-  public Role(RoleDto dto) {
-    this.id = dto.id();
-    this.label = dto.label();
-    this.code = dto.code();
+  public Role(Integer id) {
+    this.id = id;
   }
 }

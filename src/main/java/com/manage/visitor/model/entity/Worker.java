@@ -35,36 +35,7 @@ public class Worker {
   @JoinColumn(name = "jobId")
   private Job job;
 
-  @OneToMany(mappedBy = "worker")
-  private Set<RoleWorker> roles;
-
-  @OneToMany(mappedBy = "worker")
-  private List<WorkerVisitor> visitors;
-
-  public Worker(
-      Integer id,
-      String name,
-      String surname,
-      LocalDate birthDate,
-      String identifier,
-      String pw,
-      Job job) {
+  public Worker(Integer id) {
     this.id = id;
-    this.name = name;
-    this.surname = surname;
-    this.birthDate = birthDate;
-    this.identifier = identifier;
-    this.pw = pw;
-    this.job = job;
-  }
-
-  public Worker(WorkerDto dto) {
-    this.id = dto.id();
-    this.name = dto.name();
-    this.surname = dto.surname();
-    this.birthDate = dto.birthDate();
-    this.identifier = dto.identifier();
-    this.pw = dto.password();
-    this.job = new Job(dto.job());
   }
 }
