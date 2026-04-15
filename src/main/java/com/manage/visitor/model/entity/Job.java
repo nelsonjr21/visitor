@@ -25,12 +25,7 @@ public class Job {
   private String label;
   private Integer keyJobId;
 
-  @OneToMany(mappedBy = "job", fetch = FetchType.LAZY)
-  private Set<Worker> workers;
-
-  public Job(JobDto dto) {
-    this.id = dto.id();
-    this.label = dto.label();
-    this.keyJobId = dto.keyJobId();
+  public Job(Integer id) {
+    this.id = id;
   }
 }

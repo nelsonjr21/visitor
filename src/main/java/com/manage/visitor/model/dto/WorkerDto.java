@@ -17,29 +17,4 @@ public record WorkerDto(
     List<RoleDto> roleList,
     JobDto job,
     @JsonInclude(JsonInclude.Include.NON_NULL) String token) {
-  public WorkerDto(Worker data, List<RoleDto> roleDtoList, JobDto jobDto, String token) {
-    this(
-        data.getId(),
-        data.getName(),
-        data.getSurname(),
-        data.getBirthDate(),
-        data.getIdentifier(),
-        null,
-        roleDtoList,
-        jobDto,
-        token);
-  }
-
-  public WorkerDto(Worker data, JobDto jobDto, List<RoleDto> roleDtoList) {
-    this(
-        data.getId(),
-        data.getName(),
-        data.getSurname(),
-        data.getBirthDate(),
-        data.getIdentifier(),
-        null,
-        roleDtoList,
-        jobDto,
-        null);
-  }
 }

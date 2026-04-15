@@ -1,12 +1,5 @@
 package com.manage.visitor.service.admin;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
-import org.springframework.stereotype.Service;
-
 import com.manage.visitor.helpers.exception.AppException;
 import com.manage.visitor.helpers.exception.BadRequestException;
 import com.manage.visitor.helpers.exception.DataNotFoundException;
@@ -16,12 +9,18 @@ import com.manage.visitor.model.dto.admin.RoleFeatureDto;
 import com.manage.visitor.model.entity.admin.Feature;
 import com.manage.visitor.model.entity.admin.Role;
 import com.manage.visitor.model.entity.admin.RoleFeature;
+import com.manage.visitor.model.mapper.admin.FeatureMapper;
 import com.manage.visitor.repository.admin.FeatureRepository;
 import com.manage.visitor.repository.admin.RoleFeatureRepository;
-
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -29,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 public class FeatureService {
 
   private final FeatureRepository featureRepository;
+  private final FeatureMapper featureMapper;
   private final RoleFeatureRepository roleFeatureRepository;
 
   // 1. on vérifie que l'idKey existe
@@ -47,7 +47,7 @@ public class FeatureService {
 
     try {
       if (dto.id() == null) {
-        Feature data = new Feature(dto); // convert dto to entity for saving
+        Feature data = featureMapper.toEntity(dto); // convert dto to entity for saving
         // saved
         Feature f = featureRepository.save(data);
         // 2.
@@ -61,11 +61,11 @@ public class FeatureService {
                     new RoleFeature(
                         null,
                         false,
-                        new Role(x.getId(), null, null),
-                        new Feature(f.getId(), null, null, null, null)));
+                        new Role(x.getId()),
+                        new Feature(f.getId())));
               });
         }
-        return new FeatureDto(f);
+        return featureMapper.toDto(f);
       }
     } catch (Exception e) {
       log.error("save feature failed: ", e);
@@ -77,7 +77,7 @@ public class FeatureService {
   public List<FeatureDto> getAll() {
     log.info("loading feature");
     try {
-      return featureRepository.findAll().stream().map(FeatureDto::new).toList();
+      return featureRepository.findAll().stream().map(featureMapper::toDto).toList();
     } catch (Exception e) {
       log.error("loading feature failed: ", e);
       throw new AppException(e.getMessage());
@@ -87,7 +87,7 @@ public class FeatureService {
   public List<FeatureDto> getAllKeyFeature() {
     log.info("loading key feature");
     try {
-      return featureRepository.findByIdKeyIsNotNull().stream().map(FeatureDto::new).toList();
+      return featureRepository.findByIdKeyIsNotNull().stream().map(featureMapper::toDto).toList();
     } catch (Exception e) {
       log.error("loading key feature failed: ", e);
       throw new AppException(e.getMessage());
@@ -103,8 +103,8 @@ public class FeatureService {
           new RoleFeature(
               null,
               false,
-              new Role(roleId, null, null),
-              new Feature(idKeyFeature, null, null, null, null)));
+              new Role(roleId),
+              new Feature(idKeyFeature)));
       // after add other feature
       featureRepository
           .findByIdKey(idKeyFeature)
@@ -114,8 +114,8 @@ public class FeatureService {
                     new RoleFeature(
                         null,
                         false,
-                        new Role(roleId, null, null),
-                        new Feature(x.getId(), null, null, null, null)));
+                        new Role(roleId),
+                        new Feature(x.getId())));
               });
     } catch (Exception e) {
       log.error("save role with failed: ", e);
@@ -128,7 +128,7 @@ public class FeatureService {
     try {
       Optional<Feature> data = featureRepository.findById(id);
       if (data.isPresent()) {
-        return new FeatureDto(data.get());
+        return featureMapper.toDto(data.get());
       }
     } catch (Exception e) {
       log.error("loading Feature failed : ", e);
@@ -150,7 +150,7 @@ public class FeatureService {
         existing.setCode(dto.code());
         existing.setIdKey(dto.idKey());
         existing.setUrl(dto.url());
-        return new FeatureDto(featureRepository.save(existing));
+        return featureMapper.toDto(featureRepository.save(existing));
       }
     } catch (Exception e) {
       log.error("update feature failed: ", e);
@@ -187,8 +187,8 @@ public class FeatureService {
                               new RoleFeature(
                                   roleFeature.getId(),
                                   x.state(),
-                                  new Role(dto.roleId(), null, null),
-                                  new Feature(x.id(), null, null, null, null))));
+                                  new Role(dto.roleId()),
+                                  new Feature(x.id()))));
                 });
         if (!toSave.isEmpty()) {
           roleFeatureRepository.saveAll(toSave);

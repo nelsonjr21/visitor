@@ -24,13 +24,4 @@ public class Visitor {
 
   private String name;
   private String surname;
-
-  @OneToMany(mappedBy = "visitor")
-  private List<WorkerVisitor> workers;
-
-  public Visitor(VisitorDto dto) {
-    id = dto.id();
-    name = dto.name();
-    surname = dto.surname();
-  }
 }

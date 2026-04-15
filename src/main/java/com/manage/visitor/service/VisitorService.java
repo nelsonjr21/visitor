@@ -3,6 +3,7 @@ package com.manage.visitor.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.manage.visitor.model.mapper.VisitorMapper;
 import org.springframework.stereotype.Service;
 
 import com.manage.visitor.helpers.exception.AppException;
@@ -22,12 +23,13 @@ import lombok.extern.slf4j.Slf4j;
 public class VisitorService {
 
   private final VisitorRepository repository;
+  private final VisitorMapper visitorMapper;
 
   public VisitorDto save(VisitorDto dto) {
     log.info("save visitor");
     try {
       if (dto.id() == null) {
-        return new VisitorDto(repository.save(new Visitor(dto)));
+        return visitorMapper.toDto(repository.save(visitorMapper.toEntity(dto)));
       }
     } catch (Exception e) {
       log.error("save visitor failed: ", e);
@@ -40,7 +42,7 @@ public class VisitorService {
     log.info("save demand visitor");
     try {
       if (dto.id() == null) {
-        return new VisitorDto(repository.save(new Visitor(dto)));
+        return visitorMapper.toDto(repository.save(visitorMapper.toEntity(dto)));
       }
     } catch (Exception e) {
       log.error("save demand visitor failed: ", e);
@@ -52,7 +54,7 @@ public class VisitorService {
   public List<VisitorDto> getAll() {
     log.info("loading visitor");
     try {
-      return repository.findAll().stream().map(VisitorDto::new).toList();
+      return repository.findAll().stream().map(visitorMapper::toDto).toList();
     } catch (Exception e) {
       log.error("loading visitor failed: ", e);
       throw new AppException(e.getMessage());
@@ -64,7 +66,7 @@ public class VisitorService {
     try {
       Optional<Visitor> data = repository.findById(id);
       if (data.isPresent()) {
-        return new VisitorDto(data.get());
+        return visitorMapper.toDto(data.get());
       }
     } catch (Exception e) {
       log.error("loading Visitor failed : ", e);
@@ -84,7 +86,7 @@ public class VisitorService {
         Visitor existing = d.get();
         existing.setName(dto.name());
         existing.setSurname(dto.surname());
-        return new VisitorDto(repository.save(existing));
+        return visitorMapper.toDto(repository.save(existing));
       }
     } catch (Exception e) {
       log.error("update visitor failed: ", e);

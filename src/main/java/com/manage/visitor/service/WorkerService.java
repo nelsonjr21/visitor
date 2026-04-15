@@ -3,6 +3,7 @@ package com.manage.visitor.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.manage.visitor.model.mapper.WorkerMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -40,12 +41,13 @@ public class WorkerService {
   private final JwtUtils jwtUtils;
   private final RoleWorkerRepository roleWorkerRepository;
   private final JobRepository jobRepository;
+  private final WorkerMapper workerMapper;
 
   @Transactional
   public WorkerDto save(WorkerDto dto) {
     log.info("save worker");
     try {
-      Worker data = new Worker(dto);
+      Worker data = workerMapper.toEntity(dto);
       if (data.getId() == null) {
         if (repository.findByIdentifier(data.getIdentifier()) != null) {
           throw new BadRequestException("Username already exists");
@@ -58,12 +60,12 @@ public class WorkerService {
             .forEach(
                 x -> {
                   roleWorkerRepository.save(
-                      new RoleWorker(
-                          null,
-                          new Role(x.id(), null, null),
-                          new Worker(saved.getId(), null, null, null, null, null, null)));
+                          new RoleWorker(
+                                  null,
+                                  new Role(x.id(), null, null),
+                                  new Worker(saved.getId())));
                 });
-        return new WorkerDto(saved, null, null);
+        return workerMapper.toDtoWithJobDtoAndRoleDtoList(saved, null, null);
       }
     } catch (Exception e) {
       log.error("save worker failed: ", e);
@@ -80,7 +82,7 @@ public class WorkerService {
           .isAuthenticated()) {
         String token = jwtUtils.generateToken(user.username());
         Worker data = repository.findByIdentifier(user.username());
-        return new WorkerDto(
+        return workerMapper.toDtoWithToken(
             data,
             roleWorkerRepository.findByWorker_Id(data.getId()).stream()
                 .map(y -> new RoleDto(y.getRole()))
@@ -104,7 +106,7 @@ public class WorkerService {
       return repository.findAll().stream()
           .map(
               x ->
-                  new WorkerDto(
+                      workerMapper.toDtoWithJobDtoAndRoleDtoList(
                       x,
                       jobRepository.findById(x.getJob().getId()).map(JobDto::new).orElse(null),
                       roleWorkerRepository.findByWorker_Id(x.getId()).stream()
@@ -122,7 +124,7 @@ public class WorkerService {
     try {
       Optional<Worker> data = repository.findById(id);
       if (data.isPresent()) {
-        return new WorkerDto(
+        return workerMapper.toDtoWithJobDtoAndRoleDtoList(
             data.get(),
             jobRepository.findById(data.get().getJob().getId()).map(JobDto::new).orElse(null),
             roleWorkerRepository.findByWorker_Id(data.get().getId()).stream()
@@ -139,7 +141,7 @@ public class WorkerService {
   @Transactional
   public WorkerDto update(WorkerDto dto) {
     log.info("update worker");
-    Worker data = new Worker(dto);
+    Worker data = workerMapper.toEntity(dto);
     if (data.getId() == null) {
       throw new BadRequestException(Message.ID_REQUIRED.getText());
     }
@@ -162,7 +164,7 @@ public class WorkerService {
                         new RoleWorker(null, new Role(x.id(), null, null), existing));
                   }
                 });
-        return new WorkerDto(existing, null, null);
+        return workerMapper.toDtoWithJobDtoAndRoleDtoList(existing, null, null);
       }
     } catch (Exception e) {
       log.error("update worker failed: ", e);

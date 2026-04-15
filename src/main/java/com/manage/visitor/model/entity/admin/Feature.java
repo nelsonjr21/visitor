@@ -25,11 +25,7 @@ public class Feature {
   private Integer idKey;
   private String url;
 
-  public Feature(FeatureDto dto) {
-    this.id = dto.id();
-    this.label = dto.label();
-    this.code = dto.code();
-    this.idKey = dto.idKey();
-    this.url = dto.url();
+  public Feature(Integer id) {
+    this.id = id;
   }
 }

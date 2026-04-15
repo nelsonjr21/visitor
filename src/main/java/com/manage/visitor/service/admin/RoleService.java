@@ -3,6 +3,7 @@ package com.manage.visitor.service.admin;
 import java.util.List;
 import java.util.Optional;
 
+import com.manage.visitor.model.mapper.admin.RoleMapper;
 import org.springframework.stereotype.Service;
 
 import com.manage.visitor.helpers.exception.AppException;
@@ -22,12 +23,13 @@ import lombok.extern.slf4j.Slf4j;
 public class RoleService {
 
   private final RoleRepository repository;
+  private final RoleMapper roleMapper;
 
   public RoleDto save(RoleDto dto) {
     log.info("save role");
     try {
       if (dto.id() == null) {
-        return new RoleDto(repository.save(new Role(dto)));
+        return roleMapper.toDto(repository.save(roleMapper.toEntity(dto)));
       }
     } catch (Exception e) {
       log.error("save role failed: ", e);
@@ -39,7 +41,7 @@ public class RoleService {
   public List<RoleDto> getAll() {
     log.info("loading role");
     try {
-      return repository.findAll().stream().map(RoleDto::new).toList();
+      return repository.findAll().stream().map(roleMapper::toDto).toList();
     } catch (Exception e) {
       log.error("loading role failed: ", e);
       throw new AppException(e.getMessage());
@@ -51,7 +53,7 @@ public class RoleService {
     try {
       Optional<Role> data = repository.findById(id);
       if (data.isPresent()) {
-        return new RoleDto(data.get());
+        return roleMapper.toDto(data.get());
       }
     } catch (Exception e) {
       log.error("loading role failed : ", e);
@@ -71,7 +73,7 @@ public class RoleService {
         Role existing = d.get();
         existing.setLabel(dto.label());
         existing.setCode(dto.code());
-        return new RoleDto(repository.save(existing));
+        return roleMapper.toDto(repository.save(existing));
       }
     } catch (Exception e) {
       log.error("update roleList failed: ", e);
