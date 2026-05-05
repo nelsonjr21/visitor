@@ -3,7 +3,11 @@ package com.manage.visitor.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.manage.visitor.model.entity.Job;
+import com.manage.visitor.model.mapper.JobMapper;
 import com.manage.visitor.model.mapper.WorkerMapper;
+import com.manage.visitor.model.mapper.admin.RoleMapper;
+import com.manage.visitor.repository.admin.RoleRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,6 +33,7 @@ import com.manage.visitor.repository.admin.RoleWorkerRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.client.HttpClientErrorException;
 
 @Slf4j
 @Service
@@ -41,9 +46,12 @@ public class WorkerService {
   private final JwtUtils jwtUtils;
   private final RoleWorkerRepository roleWorkerRepository;
   private final JobRepository jobRepository;
+  private final RoleRepository roleRepository;
   private final WorkerMapper workerMapper;
+  private final JobMapper jobMapper;
+    private final RoleMapper roleMapper;
 
-  @Transactional
+    @Transactional
   public WorkerDto save(WorkerDto dto) {
     log.info("save worker");
     try {
@@ -85,12 +93,15 @@ public class WorkerService {
         return workerMapper.toDtoWithToken(
             data,
             roleWorkerRepository.findByWorker_Id(data.getId()).stream()
-                .map(y -> new RoleDto(y.getRole()))
+                .map(y -> {
+                    Optional<Role> role = roleRepository.findById(y.getRole().getId());
+                    return role.map(roleMapper::toDto).orElse(null);
+                })
                 .toList(),
-            jobRepository.findById(data.getJob().getId()).map(JobDto::new).orElse(null),
+            jobRepository.findById(data.getJob().getId()).map(jobMapper::toDto).orElse(null),
             token);
       }
-    } catch (BadCredentialsException e) {
+    } catch (HttpClientErrorException.Conflict e) {
       log.error("login worker failed: ", e);
       throw new BadCredentialsException(Message.UNAUTHORIZED.getText());
     } catch (Exception e) {
@@ -108,9 +119,9 @@ public class WorkerService {
               x ->
                       workerMapper.toDtoWithJobDtoAndRoleDtoList(
                       x,
-                      jobRepository.findById(x.getJob().getId()).map(JobDto::new).orElse(null),
+                      jobRepository.findById(x.getJob().getId()).map(jobMapper::toDto).orElse(null),
                       roleWorkerRepository.findByWorker_Id(x.getId()).stream()
-                          .map(y -> new RoleDto(y.getRole()))
+                          .map(y -> new RoleDto(y.getRole().getId(), null, null))
                           .toList()))
           .toList();
     } catch (Exception e) {
@@ -126,9 +137,9 @@ public class WorkerService {
       if (data.isPresent()) {
         return workerMapper.toDtoWithJobDtoAndRoleDtoList(
             data.get(),
-            jobRepository.findById(data.get().getJob().getId()).map(JobDto::new).orElse(null),
+            jobRepository.findById(data.get().getJob().getId()).map(jobMapper::toDto).orElse(null),
             roleWorkerRepository.findByWorker_Id(data.get().getId()).stream()
-                .map(y -> new RoleDto(y.getRole()))
+                .map(y -> new RoleDto(y.getRole().getId(), null, null))
                 .toList());
       }
     } catch (Exception e) {
