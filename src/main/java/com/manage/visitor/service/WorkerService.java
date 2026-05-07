@@ -73,11 +73,10 @@ public class WorkerService {
                                   .worker(Worker.builder().id(saved.getId()).build())
                                   .build());
                 });
-        return workerMapper.toDtoWithJobDtoAndRoleDtoList(
+        return workerMapperToDto(
                 saved,
-                jobRepository.findJobById(saved.getJob().getId()),
-                roleRepository.findByRoleWorkersWorkerId(saved.getId()) //  on a la liste des rôles en fonctions de worker id
-                        .stream().map(roleMapper::toDto).toList()
+                saved.getJob().getId(),
+                saved.getId()
         );
     } catch (Exception e) {
       log.error("save worker failed: ", e);
@@ -101,7 +100,7 @@ public class WorkerService {
                     return role.map(roleMapper::toDto).orElse(null);
                 })
                 .toList(),
-            jobRepository.findById(data.getJob().getId()).map(jobMapper::toDto).orElse(null),
+                jobMapper.toDto(jobRepository.findJobById(data.getJob().getId())),
             token);
       }
     } catch (HttpClientErrorException.Conflict e) {
@@ -120,11 +119,10 @@ public class WorkerService {
       return repository.findAll().stream()
           .map(
               x ->
-                      workerMapper.toDtoWithJobDtoAndRoleDtoList(
-                      x,
-                      jobRepository.findJobById(x.getJob().getId()),
-                              roleRepository.findByRoleWorkersWorkerId(x.getId()) //  on a la liste des rôles en fonctions de worker id
-                                      .stream().map(roleMapper::toDto).toList()
+                      workerMapperToDto(
+                              x,
+                              x.getJob().getId(),
+                              x.getId()
                       )
           ).toList();
     } catch (Exception e) {
@@ -138,11 +136,10 @@ public class WorkerService {
     try {
       Optional<Worker> data = repository.findById(id);
       if (data.isPresent()) {
-        return workerMapper.toDtoWithJobDtoAndRoleDtoList(
-            data.get(),
-                jobRepository.findJobById(data.get().getJob().getId()),
-                roleRepository.findByRoleWorkersWorkerId(data.get().getId()) //  on a la liste des rôles en fonctions de worker id
-                        .stream().map(roleMapper::toDto).toList()
+        return workerMapperToDto(
+                data.get(),
+                data.get().getJob().getId(),
+                data.get().getId()
         );
       }
     } catch (Exception e) {
@@ -176,12 +173,11 @@ public class WorkerService {
                     );
                   }
                 });
-        return workerMapper.toDtoWithJobDtoAndRoleDtoList(
-                existing.get(),
-                jobRepository.findJobById(existing.get().getJob().getId()),
-                roleRepository.findByRoleWorkersWorkerId(existing.get().getId()) //  on a la liste des rôles en fonctions de worker id
-                        .stream().map(roleMapper::toDto).toList()
-        );
+          return workerMapperToDto(
+                  existing.get(),
+                  existing.get().getJob().getId(),
+                  existing.get().getId()
+          );
       }
     } catch (Exception e) {
       log.error("update worker failed: ", e);
@@ -203,5 +199,17 @@ public class WorkerService {
       throw new AppException(e.getMessage());
     }
     throw new DataNotFoundException(Message.DATA_NOT_FOUND.getText());
+  }
+
+  /*
+  * Charge les sous objets après ajout, mise à jour, getall getbyid
+  * */
+  private WorkerDto workerMapperToDto(Worker worker, Integer jobId, Integer roleId) {
+        return workerMapper.toDtoWithJobDtoAndRoleDtoList(
+                worker,
+                jobRepository.findJobById(jobId),
+                roleRepository.findByRoleWorkersWorkerId(roleId) //  on a la liste des rôles en fonctions de worker id
+                        .stream().map(roleMapper::toDto).toList()
+        );
   }
 }
