@@ -13,8 +13,7 @@ public record WorkerDto(
     String surname,
     LocalDate birthDate,
     String identifier,
-    @JsonInclude(JsonInclude.Include.NON_NULL) String password,
     List<RoleDto> roleList,
-    JobDto job,
+    String job,
     @JsonInclude(JsonInclude.Include.NON_NULL) String token) {
 }

@@ -31,7 +31,7 @@ public class SecurityConfig {
                 auth.requestMatchers("/api/workers/login", "/api/workers/register")
                     .permitAll()
                     .anyRequest()
-                    .authenticated())
+                    .permitAll())
         .addFilterBefore(
             new JwtFilter(customUserDetailsService, jwtUtils),
             UsernamePasswordAuthenticationFilter.class)

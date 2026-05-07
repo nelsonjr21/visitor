@@ -3,6 +3,7 @@ package com.manage.visitor.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.manage.visitor.model.dto.form.JobFormDto;
 import com.manage.visitor.model.mapper.JobMapper;
 import org.springframework.stereotype.Service;
 
@@ -25,17 +26,14 @@ public class JobService {
   private final JobRepository repository;
   private final JobMapper jobMapper;
 
-  public JobDto save(JobDto dto) {
+  public JobDto save(JobFormDto dto) {
     log.info("save job");
     try {
-      if (dto.id() == null) {
         return jobMapper.toDto(repository.save(jobMapper.toEntity(dto)));
-      }
     } catch (Exception e) {
       log.error("save job failed: ", e);
       throw new AppException(e.getMessage());
     }
-    throw new BadRequestException(Message.ID_NOT_REQUIRED.getText());
   }
 
   public List<JobDto> getAll() {
@@ -62,18 +60,14 @@ public class JobService {
     throw new DataNotFoundException(Message.DATA_NOT_FOUND.getText());
   }
 
-  public JobDto update(JobDto dto) {
+  public JobDto update(Integer id, JobFormDto dto) {
     log.info("update job");
-    if (dto.id() == null) {
-      throw new BadRequestException(Message.ID_REQUIRED.getText());
-    }
     try {
-      Optional<Job> d = repository.findById(dto.id());
-      if (d.isPresent()) {
-        Job existing = d.get();
-        existing.setLabel(dto.label());
-        existing.setKeyJobId(dto.keyJobId());
-        return jobMapper.toDto(repository.save(jobMapper.toEntity(dto)));
+      Optional<Job> existing = repository.findById(id);
+      if (existing.isPresent()) {
+        existing.get().setLabel(dto.label());
+        existing.get().setKeyJobId(dto.keyJobId());
+        return jobMapper.toDto(repository.save(existing.get()));
       }
     } catch (Exception e) {
       log.error("update job failed: ", e);

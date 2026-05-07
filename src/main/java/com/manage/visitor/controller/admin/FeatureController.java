@@ -2,6 +2,7 @@ package com.manage.visitor.controller.admin;
 
 import java.util.List;
 
+import com.manage.visitor.model.dto.form.FeatureFormDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,33 +23,33 @@ public class FeatureController {
   private final FeatureService service;
 
   @PostMapping
-  public ResponseEntity<ApiResponse<FeatureDto>> save(@RequestBody FeatureDto dto) {
+  public ResponseEntity<FeatureDto> save(@RequestBody FeatureFormDto dto) {
     log.info("HTTP POST /features body={}", dto);
-    return new ResponseEntity<>(ApiResponse.success(service.save(dto)), HttpStatus.OK);
+    return ResponseEntity.status(HttpStatus.CREATED).body(service.save(dto));
   }
 
   @GetMapping
-  public ResponseEntity<ApiResponse<List<FeatureDto>>> getAll() {
+  public ResponseEntity<List<FeatureDto>> getAll() {
     log.info("HTTP GET /features");
-    return new ResponseEntity<>(ApiResponse.success(service.getAll()), HttpStatus.OK);
+    return ResponseEntity.ok().body(service.getAll());
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<ApiResponse<FeatureDto>> getById(@PathVariable Integer id) {
+  public ResponseEntity<FeatureDto> getById(@PathVariable Integer id) {
     log.info("HTTP GET /features/{}", id);
-    return new ResponseEntity<>(ApiResponse.success(service.getById(id)), HttpStatus.OK);
+    return ResponseEntity.ok().body(service.getById(id));
   }
 
-  @PutMapping
-  public ResponseEntity<ApiResponse<FeatureDto>> update(@RequestBody FeatureDto dto) {
+  @PutMapping("/{id}")
+  public ResponseEntity<FeatureDto> update(@PathVariable Integer id, @RequestBody FeatureFormDto dto) {
     log.info("HTTP PUT /features body={}", dto);
-    return new ResponseEntity<>(ApiResponse.success(service.update(dto)), HttpStatus.OK);
+    return ResponseEntity.ok().body(service.update(id, dto));
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<ApiResponse<?>> delete(@PathVariable Integer id) {
+  public ResponseEntity<?> delete(@PathVariable Integer id) {
     log.info("HTTP DELETE /features/{}", id);
     service.delete(id);
-    return new ResponseEntity<>(ApiResponse.success(null), HttpStatus.OK);
+    return ResponseEntity.noContent().build();
   }
 }

@@ -3,11 +3,11 @@ package com.manage.visitor.model.entity.admin;
 import com.manage.visitor.model.dto.admin.RoleDto;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+import java.util.List;
+
+@Builder
 @Getter
 @Setter
 @Entity
@@ -22,6 +22,9 @@ public class Role {
 
   private String label;
   private String code;
+
+  @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
+  private List<RoleWorker> roleWorkers;
 
   public Role(Integer id) {
     this.id = id;

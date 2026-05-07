@@ -2,6 +2,7 @@ package com.manage.visitor.model.mapper;
 
 import com.manage.visitor.model.dto.JobDto;
 import com.manage.visitor.model.dto.VisitorDto;
+import com.manage.visitor.model.dto.form.JobFormDto;
 import com.manage.visitor.model.entity.Job;
 import com.manage.visitor.model.entity.Visitor;
 import com.manage.visitor.model.entity.Worker;
@@ -17,6 +18,7 @@ import java.util.Set;
 @Component
 public class JobMapper {
 
+  // GETALL OR GETBYID
   public JobDto toDto(Job data) {
     return new JobDto(
             data.getId(),
@@ -24,11 +26,12 @@ public class JobMapper {
             data.getKeyJobId());
   }
 
-  public Job toEntity(JobDto dto) {
-    return new Job(
-            dto.id(),
-            dto.label(),
-            dto.keyJobId());
+  // ADD
+  public Job toEntity(JobFormDto dto) {
+    return Job.builder()
+            .label(dto.label())
+            .keyJobId(dto.keyJobId())
+            .build();
   }
 
 }

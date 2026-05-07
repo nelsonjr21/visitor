@@ -6,6 +6,7 @@ import com.manage.visitor.helpers.exception.DataNotFoundException;
 import com.manage.visitor.helpers.http.Message;
 import com.manage.visitor.model.dto.admin.FeatureDto;
 import com.manage.visitor.model.dto.admin.RoleFeatureDto;
+import com.manage.visitor.model.dto.form.FeatureFormDto;
 import com.manage.visitor.model.entity.admin.Feature;
 import com.manage.visitor.model.entity.admin.Role;
 import com.manage.visitor.model.entity.admin.RoleFeature;
@@ -31,12 +32,12 @@ public class FeatureService {
   private final FeatureMapper featureMapper;
   private final RoleFeatureRepository roleFeatureRepository;
 
-  // 1. on vérifie que l'idKey existe
+
   // 2. avant dajouter une nouvelle feafture faudrais vérifier sil le groupe de role
   // auquel est associé cette fonctionnalité nest pas déjà associé à un role si oui l'associé au
   // role
   @Transactional
-  public FeatureDto save(FeatureDto dto) {
+  public FeatureDto save(FeatureFormDto dto) {
     log.info("save feature");
     if (dto.idKey() != null) {
       // 1.
@@ -46,32 +47,29 @@ public class FeatureService {
     }
 
     try {
-      if (dto.id() == null) {
-        Feature data = featureMapper.toEntity(dto); // convert dto to entity for saving
         // saved
-        Feature f = featureRepository.save(data);
+        Feature saved = featureRepository.save(featureMapper.toEntity(dto));
         // 2.
         List<RoleFeature> roleWithKeyFeature =
-            roleFeatureRepository.findByFeature_IdKey(data.getIdKey());
+            roleFeatureRepository.findByFeature_IdKey(saved.getIdKey());
         if (!roleWithKeyFeature.isEmpty()) {
           roleWithKeyFeature.forEach(
               x -> {
                 log.info("add to role={}", x.getId());
                 roleFeatureRepository.save(
-                    new RoleFeature(
-                        null,
-                        false,
-                        new Role(x.getId()),
-                        new Feature(f.getId())));
+                        RoleFeature.builder()
+                                .state(false)
+                                .role(Role.builder().id(x.getId()).build())
+                                .feature(Feature.builder().id(saved.getId()).build()
+                                ).build()
+                );
               });
         }
-        return featureMapper.toDto(f);
-      }
+        return featureMapper.toDto(saved);
     } catch (Exception e) {
       log.error("save feature failed: ", e);
       throw new AppException(e.getMessage());
     }
-    throw new BadRequestException(Message.ID_NOT_REQUIRED.getText());
   }
 
   public List<FeatureDto> getAll() {
@@ -100,11 +98,12 @@ public class FeatureService {
     try {
       // add begin the key feature
       roleFeatureRepository.save(
-          new RoleFeature(
-              null,
-              false,
-              new Role(roleId),
-              new Feature(idKeyFeature)));
+           RoleFeature.builder()
+                   .state(false)
+                   .role(Role.builder().id(roleId).build())
+                   .feature(Feature.builder().id(idKeyFeature).build())
+                   .build()
+      );
       // after add other feature
       featureRepository
           .findByIdKey(idKeyFeature)
@@ -137,20 +136,16 @@ public class FeatureService {
     throw new DataNotFoundException(Message.DATA_NOT_FOUND.getText());
   }
 
-  public FeatureDto update(FeatureDto dto) {
+  public FeatureDto update(Integer id, FeatureFormDto dto) {
     log.info("update feature");
-    if (dto.id() == null) {
-      throw new BadRequestException(Message.ID_REQUIRED.getText());
-    }
     try {
-      Optional<Feature> d = featureRepository.findById(dto.id());
-      if (d.isPresent()) {
-        Feature existing = d.get();
-        existing.setLabel(dto.label());
-        existing.setCode(dto.code());
-        existing.setIdKey(dto.idKey());
-        existing.setUrl(dto.url());
-        return featureMapper.toDto(featureRepository.save(existing));
+      Optional<Feature> existing = featureRepository.findById(id);
+      if (existing.isPresent()) {
+        existing.get().setLabel(dto.label());
+        existing.get().setCode(dto.code());
+        existing.get().setIdKey(dto.idKey());
+        existing.get().setUrl(dto.url());
+        return featureMapper.toDto(featureRepository.save(existing.get()));
       }
     } catch (Exception e) {
       log.error("update feature failed: ", e);

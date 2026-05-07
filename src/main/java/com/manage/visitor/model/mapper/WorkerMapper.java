@@ -3,6 +3,7 @@ package com.manage.visitor.model.mapper;
 import com.manage.visitor.model.dto.JobDto;
 import com.manage.visitor.model.dto.WorkerDto;
 import com.manage.visitor.model.dto.admin.RoleDto;
+import com.manage.visitor.model.dto.form.WorkerFormDto;
 import com.manage.visitor.model.entity.Job;
 import com.manage.visitor.model.entity.Worker;
 import org.springframework.stereotype.Component;
@@ -19,26 +20,31 @@ public class WorkerMapper {
             data.getSurname(),
             data.getBirthDate(),
             data.getIdentifier(),
-            null,
             roleDtoList,
-            jobDto,
+            jobDto.label(),
             token);
   }
 
-  public WorkerDto toDtoWithJobDtoAndRoleDtoList(Worker data, JobDto jobDto, List<RoleDto> roleDtoList) {
+  public WorkerDto toDtoWithJobDtoAndRoleDtoList(Worker data, Job job, List<RoleDto> roleDtoList) {
     return new WorkerDto(
             data.getId(),
             data.getName(),
             data.getSurname(),
             data.getBirthDate(),
             data.getIdentifier(),
-            null,
             roleDtoList,
-            jobDto,
+            job.getLabel(),
             null);
   }
 
-  public Worker toEntity(WorkerDto dto) {
-    return new Worker(dto.id(), dto.name(), dto.surname(), dto.birthDate(), dto.identifier(), dto.password(), new Job(dto.job().id()));
+  public Worker toEntity(WorkerFormDto dto) {
+    return Worker.builder()
+            .name(dto.name())
+            .surname(dto.surname())
+            .birthDate(dto.birthDate())
+            .identifier(dto.identifier())
+            .pw(dto.password())
+            .job(Job.builder().id(dto.jobId()).build())
+            .build();
   }
 }

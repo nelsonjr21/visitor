@@ -3,6 +3,7 @@ package com.manage.visitor.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.manage.visitor.model.dto.form.WorkerFormDto;
 import com.manage.visitor.model.entity.Job;
 import com.manage.visitor.model.mapper.JobMapper;
 import com.manage.visitor.model.mapper.WorkerMapper;
@@ -52,11 +53,10 @@ public class WorkerService {
     private final RoleMapper roleMapper;
 
     @Transactional
-  public WorkerDto save(WorkerDto dto) {
+  public WorkerDto save(WorkerFormDto dto) {
     log.info("save worker");
     try {
       Worker data = workerMapper.toEntity(dto);
-      if (data.getId() == null) {
         if (repository.findByIdentifier(data.getIdentifier()) != null) {
           throw new BadRequestException("Username already exists");
         }
@@ -68,18 +68,21 @@ public class WorkerService {
             .forEach(
                 x -> {
                   roleWorkerRepository.save(
-                          new RoleWorker(
-                                  null,
-                                  new Role(x.id(), null, null),
-                                  new Worker(saved.getId())));
+                          RoleWorker.builder()
+                                  .role(Role.builder().id(x).build())
+                                  .worker(Worker.builder().id(saved.getId()).build())
+                                  .build());
                 });
-        return workerMapper.toDtoWithJobDtoAndRoleDtoList(saved, null, null);
-      }
+        return workerMapper.toDtoWithJobDtoAndRoleDtoList(
+                saved,
+                jobRepository.findJobById(saved.getJob().getId()),
+                roleRepository.findByRoleWorkersWorkerId(saved.getId()) //  on a la liste des rôles en fonctions de worker id
+                        .stream().map(roleMapper::toDto).toList()
+        );
     } catch (Exception e) {
       log.error("save worker failed: ", e);
       throw new AppException(e.getMessage());
     }
-    throw new BadRequestException(Message.ID_NOT_REQUIRED.getText());
   }
 
   public WorkerDto login(UserDto user) {
@@ -119,11 +122,11 @@ public class WorkerService {
               x ->
                       workerMapper.toDtoWithJobDtoAndRoleDtoList(
                       x,
-                      jobRepository.findById(x.getJob().getId()).map(jobMapper::toDto).orElse(null),
-                      roleWorkerRepository.findByWorker_Id(x.getId()).stream()
-                          .map(y -> new RoleDto(y.getRole().getId(), null, null))
-                          .toList()))
-          .toList();
+                      jobRepository.findJobById(x.getJob().getId()),
+                              roleRepository.findByRoleWorkersWorkerId(x.getId()) //  on a la liste des rôles en fonctions de worker id
+                                      .stream().map(roleMapper::toDto).toList()
+                      )
+          ).toList();
     } catch (Exception e) {
       log.error("loading worker failed: ", e);
       throw new AppException(e.getMessage());
@@ -137,10 +140,10 @@ public class WorkerService {
       if (data.isPresent()) {
         return workerMapper.toDtoWithJobDtoAndRoleDtoList(
             data.get(),
-            jobRepository.findById(data.get().getJob().getId()).map(jobMapper::toDto).orElse(null),
-            roleWorkerRepository.findByWorker_Id(data.get().getId()).stream()
-                .map(y -> new RoleDto(y.getRole().getId(), null, null))
-                .toList());
+                jobRepository.findJobById(data.get().getJob().getId()),
+                roleRepository.findByRoleWorkersWorkerId(data.get().getId()) //  on a la liste des rôles en fonctions de worker id
+                        .stream().map(roleMapper::toDto).toList()
+        );
       }
     } catch (Exception e) {
       log.error("loading Worker failed : ", e);
@@ -150,32 +153,35 @@ public class WorkerService {
   }
 
   @Transactional
-  public WorkerDto update(WorkerDto dto) {
+  public WorkerDto update(Integer id, WorkerFormDto dto) {
     log.info("update worker");
-    Worker data = workerMapper.toEntity(dto);
-    if (data.getId() == null) {
-      throw new BadRequestException(Message.ID_REQUIRED.getText());
-    }
     try {
-      Optional<Worker> d = repository.findById(data.getId());
-      if (d.isPresent()) {
-        Worker existing = d.get();
-        existing.setName(data.getName());
-        existing.setSurname(data.getSurname());
-        existing.setBirthDate(data.getBirthDate());
-        existing.setIdentifier(data.getIdentifier());
-        existing.setJob(data.getJob());
-        repository.save(existing);
+      Optional<Worker> existing = repository.findById(id);
+      if (existing.isPresent()) {
+        existing.get().setName(dto.name());
+        existing.get().setSurname(dto.surname());
+        existing.get().setBirthDate(dto.birthDate());
+        existing.get().setIdentifier(dto.identifier());
+        existing.get().setJob(Job.builder().id(dto.jobId()).build());
+        repository.save(existing.get());
         dto.roleList()
             .forEach(
                 x -> {
-                  if (roleWorkerRepository.findByRole_IdAndWorker_Id(x.id(), existing.getId())
-                      == null) {
+                  if (roleWorkerRepository.findByRole_IdAndWorker_Id(x, existing.get().getId())) {
                     roleWorkerRepository.save(
-                        new RoleWorker(null, new Role(x.id(), null, null), existing));
+                            RoleWorker.builder()
+                                    .role(Role.builder().id(x).build())
+                                    .worker(Worker.builder().id(existing.get().getId()).build())
+                                    .build()
+                    );
                   }
                 });
-        return workerMapper.toDtoWithJobDtoAndRoleDtoList(existing, null, null);
+        return workerMapper.toDtoWithJobDtoAndRoleDtoList(
+                existing.get(),
+                jobRepository.findJobById(existing.get().getJob().getId()),
+                roleRepository.findByRoleWorkersWorkerId(existing.get().getId()) //  on a la liste des rôles en fonctions de worker id
+                        .stream().map(roleMapper::toDto).toList()
+        );
       }
     } catch (Exception e) {
       log.error("update worker failed: ", e);

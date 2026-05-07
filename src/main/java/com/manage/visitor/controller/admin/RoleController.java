@@ -2,6 +2,7 @@ package com.manage.visitor.controller.admin;
 
 import java.util.List;
 
+import com.manage.visitor.model.dto.form.RoleFormDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,33 +23,33 @@ public class RoleController {
   private final RoleService service;
 
   @PostMapping
-  public ResponseEntity<ApiResponse<RoleDto>> save(@RequestBody RoleDto dto) {
+  public ResponseEntity<RoleDto> save(@RequestBody RoleFormDto dto) {
     log.info("HTTP POST /roles body={}", dto);
-    return new ResponseEntity<>(ApiResponse.success(service.save(dto)), HttpStatus.OK);
+    return ResponseEntity.status(HttpStatus.CREATED).body(service.save(dto));
   }
 
   @GetMapping
-  public ResponseEntity<ApiResponse<List<RoleDto>>> getAll() {
+  public ResponseEntity<List<RoleDto>> getAll() {
     log.info("HTTP GET /roles");
-    return new ResponseEntity<>(ApiResponse.success(service.getAll()), HttpStatus.OK);
+    return ResponseEntity.ok().body(service.getAll());
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<ApiResponse<RoleDto>> getById(@PathVariable Integer id) {
+  public ResponseEntity<RoleDto> getById(@PathVariable Integer id) {
     log.info("HTTP GET /roles/{}", id);
-    return new ResponseEntity<>(ApiResponse.success(service.getById(id)), HttpStatus.OK);
+    return ResponseEntity.ok().body(service.getById(id));
   }
 
-  @PutMapping
-  public ResponseEntity<ApiResponse<RoleDto>> update(@RequestBody RoleDto dto) {
+  @PutMapping("/{id}")
+  public ResponseEntity<RoleDto> update(@PathVariable Integer id, @RequestBody RoleFormDto dto) {
     log.info("HTTP PUT /roles body={}", dto);
-    return new ResponseEntity<>(ApiResponse.success(service.update(dto)), HttpStatus.OK);
+    return ResponseEntity.ok(service.update(id, dto));
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<ApiResponse<?>> delete(@PathVariable Integer id) {
+  public ResponseEntity<?> delete(@PathVariable Integer id) {
     log.info("HTTP DELETE /roles/{}", id);
     service.delete(id);
-    return new ResponseEntity<>(ApiResponse.success(null), HttpStatus.OK);
+    return ResponseEntity.noContent().build();
   }
 }

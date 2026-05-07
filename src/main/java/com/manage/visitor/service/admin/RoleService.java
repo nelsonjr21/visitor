@@ -3,11 +3,11 @@ package com.manage.visitor.service.admin;
 import java.util.List;
 import java.util.Optional;
 
+import com.manage.visitor.model.dto.form.RoleFormDto;
 import com.manage.visitor.model.mapper.admin.RoleMapper;
 import org.springframework.stereotype.Service;
 
 import com.manage.visitor.helpers.exception.AppException;
-import com.manage.visitor.helpers.exception.BadRequestException;
 import com.manage.visitor.helpers.exception.DataNotFoundException;
 import com.manage.visitor.helpers.http.Message;
 import com.manage.visitor.model.dto.admin.RoleDto;
@@ -25,17 +25,14 @@ public class RoleService {
   private final RoleRepository repository;
   private final RoleMapper roleMapper;
 
-  public RoleDto save(RoleDto dto) {
+  public RoleDto save(RoleFormDto dto) {
     log.info("save role");
     try {
-      if (dto.id() == null) {
         return roleMapper.toDto(repository.save(roleMapper.toEntity(dto)));
-      }
     } catch (Exception e) {
       log.error("save role failed: ", e);
       throw new AppException(e.getMessage());
     }
-    throw new BadRequestException(Message.ID_NOT_REQUIRED.getText());
   }
 
   public List<RoleDto> getAll() {
@@ -62,21 +59,17 @@ public class RoleService {
     throw new DataNotFoundException(Message.DATA_NOT_FOUND.getText());
   }
 
-  public RoleDto update(RoleDto dto) {
+  public RoleDto update(Integer id, RoleFormDto dto) {
     log.info("update role");
-    if (dto.id() == null) {
-      throw new BadRequestException(Message.ID_REQUIRED.getText());
-    }
     try {
-      Optional<Role> d = repository.findById(dto.id());
-      if (d.isPresent()) {
-        Role existing = d.get();
-        existing.setLabel(dto.label());
-        existing.setCode(dto.code());
-        return roleMapper.toDto(repository.save(existing));
+      Optional<Role> existing = repository.findById(id);
+      if (existing.isPresent()) {
+        existing.get().setLabel(dto.label());
+        existing.get().setCode(dto.code());
+        return roleMapper.toDto(repository.save(existing.get()));
       }
     } catch (Exception e) {
-      log.error("update roleList failed: ", e);
+      log.error("update role failed: ", e);
       throw new AppException(e.getMessage());
     }
     throw new DataNotFoundException(Message.DATA_NOT_FOUND.getText());

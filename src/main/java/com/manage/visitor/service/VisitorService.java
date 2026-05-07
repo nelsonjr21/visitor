@@ -3,6 +3,7 @@ package com.manage.visitor.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.manage.visitor.model.dto.form.VisitorFormDto;
 import com.manage.visitor.model.mapper.VisitorMapper;
 import org.springframework.stereotype.Service;
 
@@ -25,20 +26,17 @@ public class VisitorService {
   private final VisitorRepository repository;
   private final VisitorMapper visitorMapper;
 
-  public VisitorDto save(VisitorDto dto) {
+  public VisitorDto save(VisitorFormDto dto) {
     log.info("save visitor");
     try {
-      if (dto.id() == null) {
         return visitorMapper.toDto(repository.save(visitorMapper.toEntity(dto)));
-      }
     } catch (Exception e) {
       log.error("save visitor failed: ", e);
       throw new AppException(e.getMessage());
     }
-    throw new BadRequestException(Message.ID_NOT_REQUIRED.getText());
   }
 
-  public VisitorDto demand(VisitorDto dto) {
+  /*public VisitorDto demand(VisitorDto dto) {
     log.info("save demand visitor");
     try {
       if (dto.id() == null) {
@@ -49,7 +47,7 @@ public class VisitorService {
       throw new AppException(e.getMessage());
     }
     throw new BadRequestException(Message.ID_NOT_REQUIRED.getText());
-  }
+  }*/
 
   public List<VisitorDto> getAll() {
     log.info("loading visitor");
@@ -75,18 +73,14 @@ public class VisitorService {
     throw new DataNotFoundException(Message.DATA_NOT_FOUND.getText());
   }
 
-  public VisitorDto update(VisitorDto dto) {
+  public VisitorDto update(Integer id, VisitorFormDto dto) {
     log.info("update visitor");
-    if (dto.id() == null) {
-      throw new BadRequestException(Message.ID_REQUIRED.getText());
-    }
     try {
-      Optional<Visitor> d = repository.findById(dto.id());
-      if (d.isPresent()) {
-        Visitor existing = d.get();
-        existing.setName(dto.name());
-        existing.setSurname(dto.surname());
-        return visitorMapper.toDto(repository.save(existing));
+      Optional<Visitor> existing = repository.findById(id);
+      if (existing.isPresent()) {
+        existing.get().setName(dto.name());
+        existing.get().setSurname(dto.surname());
+        return visitorMapper.toDto(repository.save(existing.get()));
       }
     } catch (Exception e) {
       log.error("update visitor failed: ", e);

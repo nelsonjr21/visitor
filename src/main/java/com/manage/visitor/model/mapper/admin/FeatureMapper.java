@@ -2,6 +2,7 @@ package com.manage.visitor.model.mapper.admin;
 
 import com.manage.visitor.model.dto.JobDto;
 import com.manage.visitor.model.dto.admin.FeatureDto;
+import com.manage.visitor.model.dto.form.FeatureFormDto;
 import com.manage.visitor.model.entity.Job;
 import com.manage.visitor.model.entity.admin.Feature;
 import jakarta.persistence.*;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FeatureMapper {
 
+  // GETALL OR GETBYID
   public FeatureDto toDto(Feature data) {
     return new FeatureDto(
             data.getId(),
@@ -23,13 +25,14 @@ public class FeatureMapper {
             data.getUrl());
   }
 
-  public Feature toEntity(FeatureDto dto) {
-    return new Feature(
-            dto.id(),
-            dto.label(),
-            dto.code(),
-            dto.idKey(),
-            dto.url());
+// ADD
+  public Feature toEntity(FeatureFormDto dto) {
+    return Feature.builder()
+            .code(dto.code())
+            .label(dto.label())
+            .idKey(dto.idKey())
+            .url(dto.url())
+            .build();
   }
 
 }

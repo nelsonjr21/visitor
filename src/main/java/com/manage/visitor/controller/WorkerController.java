@@ -2,6 +2,7 @@ package com.manage.visitor.controller;
 
 import java.util.List;
 
+import com.manage.visitor.model.dto.form.WorkerFormDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,39 +24,39 @@ public class WorkerController {
   private final WorkerService service;
 
   @PostMapping("/register")
-  public ResponseEntity<ApiResponse<WorkerDto>> registrer(@RequestBody WorkerDto dto) {
+  public ResponseEntity<WorkerDto> register(@RequestBody WorkerFormDto dto) {
     log.info("HTTP POST /workers/register body={}", dto);
-    return new ResponseEntity<>(ApiResponse.success(service.save(dto)), HttpStatus.OK);
+    return ResponseEntity.status(HttpStatus.CREATED).body(service.save(dto));
   }
 
   @PostMapping("/login")
-  public ResponseEntity<ApiResponse<WorkerDto>> login(@RequestBody UserDto dto) {
+  public ResponseEntity<WorkerDto> login(@RequestBody UserDto dto) {
     log.info("HTTP POST /workers/login body={}", dto);
-    return new ResponseEntity<>(ApiResponse.success(service.login(dto)), HttpStatus.OK);
+    return ResponseEntity.accepted().body(service.login(dto));
   }
 
   @GetMapping
-  public ResponseEntity<ApiResponse<List<WorkerDto>>> getAll() {
+  public ResponseEntity<List<WorkerDto>> getAll() {
     log.info("HTTP GET /workers");
-    return new ResponseEntity<>(ApiResponse.success(service.getAll()), HttpStatus.OK);
+    return ResponseEntity.ok().body(service.getAll());
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<ApiResponse<WorkerDto>> getById(@PathVariable Integer id) {
+  public ResponseEntity<WorkerDto> getById(@PathVariable Integer id) {
     log.info("HTTP GET /workers/{}", id);
-    return new ResponseEntity<>(ApiResponse.success(service.getById(id)), HttpStatus.OK);
+    return ResponseEntity.ok().body(service.getById(id));
   }
 
-  @PutMapping
-  public ResponseEntity<ApiResponse<WorkerDto>> update(@RequestBody WorkerDto dto) {
+  @PutMapping("/{id}")
+  public ResponseEntity<WorkerDto> update(@PathVariable Integer id, @RequestBody WorkerFormDto dto) {
     log.info("HTTP PUT /workers body={}", dto);
-    return new ResponseEntity<>(ApiResponse.success(service.update(dto)), HttpStatus.OK);
+    return ResponseEntity.ok(service.update(id, dto));
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<ApiResponse<?>> delete(@PathVariable Integer id) {
+  public ResponseEntity<?> delete(@PathVariable Integer id) {
     log.info("HTTP DELETE /workers/{}", id);
     service.delete(id);
-    return new ResponseEntity<>(ApiResponse.success(null), HttpStatus.OK);
+    return ResponseEntity.noContent().build();
   }
 }

@@ -2,6 +2,7 @@ package com.manage.visitor.controller;
 
 import java.util.List;
 
+import com.manage.visitor.model.dto.form.VisitorFormDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,33 +23,33 @@ public class VisitorController {
   private final VisitorService service;
 
   @PostMapping
-  public ResponseEntity<ApiResponse<VisitorDto>> save(@RequestBody VisitorDto dto) {
+  public ResponseEntity<VisitorDto> save(@RequestBody VisitorFormDto dto) {
     log.info("HTTP POST /visitors body={}", dto);
-    return new ResponseEntity<>(ApiResponse.success(service.save(dto)), HttpStatus.OK);
+    return ResponseEntity.status(HttpStatus.CREATED).body(service.save(dto));
   }
 
   @GetMapping
-  public ResponseEntity<ApiResponse<List<VisitorDto>>> getAll() {
+  public ResponseEntity<List<VisitorDto>> getAll() {
     log.info("HTTP GET /visitors");
-    return new ResponseEntity<>(ApiResponse.success(service.getAll()), HttpStatus.OK);
+    return ResponseEntity.ok().body(service.getAll());
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<ApiResponse<VisitorDto>> getById(@PathVariable Integer id) {
+  public ResponseEntity<VisitorDto> getById(@PathVariable Integer id) {
     log.info("HTTP GET /visitors/{}", id);
-    return new ResponseEntity<>(ApiResponse.success(service.getById(id)), HttpStatus.OK);
+    return ResponseEntity.ok().body(service.getById(id));
   }
 
-  @PutMapping
-  public ResponseEntity<ApiResponse<VisitorDto>> update(@RequestBody VisitorDto dto) {
+  @PutMapping("/{id}")
+  public ResponseEntity<VisitorDto> update(@PathVariable Integer id, @RequestBody VisitorFormDto dto) {
     log.info("HTTP PUT /visitors body={}", dto);
-    return new ResponseEntity<>(ApiResponse.success(service.update(dto)), HttpStatus.OK);
+    return ResponseEntity.ok(service.update(id, dto));
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<ApiResponse<?>> delete(@PathVariable Integer id) {
+  public ResponseEntity<?> delete(@PathVariable Integer id) {
     log.info("HTTP DELETE /visitors/{}", id);
     service.delete(id);
-    return new ResponseEntity<>(ApiResponse.success(null), HttpStatus.OK);
+    return ResponseEntity.noContent().build();
   }
 }
