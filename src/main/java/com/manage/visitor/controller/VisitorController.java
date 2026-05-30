@@ -2,13 +2,12 @@ package com.manage.visitor.controller;
 
 import java.util.List;
 
-import com.manage.visitor.model.dto.form.VisitorFormDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.manage.visitor.helpers.http.ApiResponse;
 import com.manage.visitor.model.dto.VisitorDto;
+import com.manage.visitor.model.dto.form.VisitorFormDto;
 import com.manage.visitor.service.VisitorService;
 
 import lombok.RequiredArgsConstructor;
@@ -41,7 +40,8 @@ public class VisitorController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<VisitorDto> update(@PathVariable Integer id, @RequestBody VisitorFormDto dto) {
+  public ResponseEntity<VisitorDto> update(
+      @PathVariable Integer id, @RequestBody VisitorFormDto dto) {
     log.info("HTTP PUT /visitors body={}", dto);
     return ResponseEntity.ok(service.update(id, dto));
   }

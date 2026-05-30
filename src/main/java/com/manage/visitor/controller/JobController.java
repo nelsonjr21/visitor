@@ -2,13 +2,12 @@ package com.manage.visitor.controller;
 
 import java.util.List;
 
-import com.manage.visitor.model.dto.form.JobFormDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.manage.visitor.helpers.http.ApiResponse;
 import com.manage.visitor.model.dto.JobDto;
+import com.manage.visitor.model.dto.form.JobFormDto;
 import com.manage.visitor.service.JobService;
 
 import lombok.RequiredArgsConstructor;

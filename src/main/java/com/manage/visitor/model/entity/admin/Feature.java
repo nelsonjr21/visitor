@@ -1,7 +1,5 @@
 package com.manage.visitor.model.entity.admin;
 
-import com.manage.visitor.model.dto.admin.FeatureDto;
-
 import jakarta.persistence.*;
 import lombok.*;
 

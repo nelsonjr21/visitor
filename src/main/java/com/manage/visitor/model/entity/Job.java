@@ -1,9 +1,5 @@
 package com.manage.visitor.model.entity;
 
-import java.util.Set;
-
-import com.manage.visitor.model.dto.JobDto;
-
 import jakarta.persistence.*;
 import lombok.*;
 

@@ -1,5 +1,12 @@
 package com.manage.visitor.service.admin;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
 import com.manage.visitor.helpers.exception.AppException;
 import com.manage.visitor.helpers.exception.BadRequestException;
 import com.manage.visitor.helpers.exception.DataNotFoundException;
@@ -13,15 +20,10 @@ import com.manage.visitor.model.entity.admin.RoleFeature;
 import com.manage.visitor.model.mapper.admin.FeatureMapper;
 import com.manage.visitor.repository.admin.FeatureRepository;
 import com.manage.visitor.repository.admin.RoleFeatureRepository;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -31,7 +33,6 @@ public class FeatureService {
   private final FeatureRepository featureRepository;
   private final FeatureMapper featureMapper;
   private final RoleFeatureRepository roleFeatureRepository;
-
 
   // 2. avant dajouter une nouvelle feafture faudrais vérifier sil le groupe de role
   // auquel est associé cette fonctionnalité nest pas déjà associé à un role si oui l'associé au
@@ -47,25 +48,24 @@ public class FeatureService {
     }
 
     try {
-        // saved
-        Feature saved = featureRepository.save(featureMapper.toEntity(dto));
-        // 2.
-        List<RoleFeature> roleWithKeyFeature =
-            roleFeatureRepository.findByFeature_IdKey(saved.getIdKey());
-        if (!roleWithKeyFeature.isEmpty()) {
-          roleWithKeyFeature.forEach(
-              x -> {
-                log.info("add to role={}", x.getId());
-                roleFeatureRepository.save(
-                        RoleFeature.builder()
-                                .state(false)
-                                .role(Role.builder().id(x.getId()).build())
-                                .feature(Feature.builder().id(saved.getId()).build()
-                                ).build()
-                );
-              });
-        }
-        return featureMapper.toDto(saved);
+      // saved
+      Feature saved = featureRepository.save(featureMapper.toEntity(dto));
+      // 2.
+      List<RoleFeature> roleWithKeyFeature =
+          roleFeatureRepository.findByFeature_IdKey(saved.getIdKey());
+      if (!roleWithKeyFeature.isEmpty()) {
+        roleWithKeyFeature.forEach(
+            x -> {
+              log.info("add to role={}", x.getId());
+              roleFeatureRepository.save(
+                  RoleFeature.builder()
+                      .state(false)
+                      .role(Role.builder().id(x.getId()).build())
+                      .feature(Feature.builder().id(saved.getId()).build())
+                      .build());
+            });
+      }
+      return featureMapper.toDto(saved);
     } catch (Exception e) {
       log.error("save feature failed: ", e);
       throw new AppException(e.getMessage());
@@ -98,23 +98,18 @@ public class FeatureService {
     try {
       // add begin the key feature
       roleFeatureRepository.save(
-           RoleFeature.builder()
-                   .state(false)
-                   .role(Role.builder().id(roleId).build())
-                   .feature(Feature.builder().id(idKeyFeature).build())
-                   .build()
-      );
+          RoleFeature.builder()
+              .state(false)
+              .role(Role.builder().id(roleId).build())
+              .feature(Feature.builder().id(idKeyFeature).build())
+              .build());
       // after add other feature
       featureRepository
           .findByIdKey(idKeyFeature)
           .forEach(
               x -> {
                 roleFeatureRepository.save(
-                    new RoleFeature(
-                        null,
-                        false,
-                        new Role(roleId),
-                        new Feature(x.getId())));
+                    new RoleFeature(null, false, new Role(roleId), new Feature(x.getId())));
               });
     } catch (Exception e) {
       log.error("save role with failed: ", e);

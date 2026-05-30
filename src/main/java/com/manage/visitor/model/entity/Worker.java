@@ -1,11 +1,6 @@
 package com.manage.visitor.model.entity;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Set;
-
-import com.manage.visitor.model.dto.WorkerDto;
-import com.manage.visitor.model.entity.admin.RoleWorker;
 
 import jakarta.persistence.*;
 import lombok.*;

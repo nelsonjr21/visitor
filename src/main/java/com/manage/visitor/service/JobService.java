@@ -3,16 +3,15 @@ package com.manage.visitor.service;
 import java.util.List;
 import java.util.Optional;
 
-import com.manage.visitor.model.dto.form.JobFormDto;
-import com.manage.visitor.model.mapper.JobMapper;
 import org.springframework.stereotype.Service;
 
 import com.manage.visitor.helpers.exception.AppException;
-import com.manage.visitor.helpers.exception.BadRequestException;
 import com.manage.visitor.helpers.exception.DataNotFoundException;
 import com.manage.visitor.helpers.http.Message;
 import com.manage.visitor.model.dto.JobDto;
+import com.manage.visitor.model.dto.form.JobFormDto;
 import com.manage.visitor.model.entity.Job;
+import com.manage.visitor.model.mapper.JobMapper;
 import com.manage.visitor.repository.JobRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,7 @@ public class JobService {
   public JobDto save(JobFormDto dto) {
     log.info("save job");
     try {
-        return jobMapper.toDto(repository.save(jobMapper.toEntity(dto)));
+      return jobMapper.toDto(repository.save(jobMapper.toEntity(dto)));
     } catch (Exception e) {
       log.error("save job failed: ", e);
       throw new AppException(e.getMessage());
