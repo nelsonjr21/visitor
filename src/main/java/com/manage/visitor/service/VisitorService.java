@@ -3,16 +3,15 @@ package com.manage.visitor.service;
 import java.util.List;
 import java.util.Optional;
 
-import com.manage.visitor.model.dto.form.VisitorFormDto;
-import com.manage.visitor.model.mapper.VisitorMapper;
 import org.springframework.stereotype.Service;
 
 import com.manage.visitor.helpers.exception.AppException;
-import com.manage.visitor.helpers.exception.BadRequestException;
 import com.manage.visitor.helpers.exception.DataNotFoundException;
 import com.manage.visitor.helpers.http.Message;
 import com.manage.visitor.model.dto.VisitorDto;
+import com.manage.visitor.model.dto.form.VisitorFormDto;
 import com.manage.visitor.model.entity.Visitor;
+import com.manage.visitor.model.mapper.VisitorMapper;
 import com.manage.visitor.repository.VisitorRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,7 @@ public class VisitorService {
   public VisitorDto save(VisitorFormDto dto) {
     log.info("save visitor");
     try {
-        return visitorMapper.toDto(repository.save(visitorMapper.toEntity(dto)));
+      return visitorMapper.toDto(repository.save(visitorMapper.toEntity(dto)));
     } catch (Exception e) {
       log.error("save visitor failed: ", e);
       throw new AppException(e.getMessage());

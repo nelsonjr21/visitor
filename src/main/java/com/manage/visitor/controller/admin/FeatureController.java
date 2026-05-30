@@ -2,13 +2,12 @@ package com.manage.visitor.controller.admin;
 
 import java.util.List;
 
-import com.manage.visitor.model.dto.form.FeatureFormDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.manage.visitor.helpers.http.ApiResponse;
 import com.manage.visitor.model.dto.admin.FeatureDto;
+import com.manage.visitor.model.dto.form.FeatureFormDto;
 import com.manage.visitor.service.admin.FeatureService;
 
 import lombok.RequiredArgsConstructor;
@@ -41,7 +40,8 @@ public class FeatureController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<FeatureDto> update(@PathVariable Integer id, @RequestBody FeatureFormDto dto) {
+  public ResponseEntity<FeatureDto> update(
+      @PathVariable Integer id, @RequestBody FeatureFormDto dto) {
     log.info("HTTP PUT /features body={}", dto);
     return ResponseEntity.ok().body(service.update(id, dto));
   }

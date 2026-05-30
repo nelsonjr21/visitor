@@ -3,15 +3,15 @@ package com.manage.visitor.service.admin;
 import java.util.List;
 import java.util.Optional;
 
-import com.manage.visitor.model.dto.form.RoleFormDto;
-import com.manage.visitor.model.mapper.admin.RoleMapper;
 import org.springframework.stereotype.Service;
 
 import com.manage.visitor.helpers.exception.AppException;
 import com.manage.visitor.helpers.exception.DataNotFoundException;
 import com.manage.visitor.helpers.http.Message;
 import com.manage.visitor.model.dto.admin.RoleDto;
+import com.manage.visitor.model.dto.form.RoleFormDto;
 import com.manage.visitor.model.entity.admin.Role;
+import com.manage.visitor.model.mapper.admin.RoleMapper;
 import com.manage.visitor.repository.admin.RoleRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class RoleService {
   public RoleDto save(RoleFormDto dto) {
     log.info("save role");
     try {
-        return roleMapper.toDto(repository.save(roleMapper.toEntity(dto)));
+      return roleMapper.toDto(repository.save(roleMapper.toEntity(dto)));
     } catch (Exception e) {
       log.error("save role failed: ", e);
       throw new AppException(e.getMessage());

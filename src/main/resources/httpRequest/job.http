@@ -1,6 +1,5 @@
 ###
 POST {{host}}:{{port}}/api/jobs
-Authorization: {{token}}
 Content-Type: application/json
 
 {

@@ -7,5 +7,5 @@ import com.manage.visitor.model.entity.Job;
 
 @Repository
 public interface JobRepository extends JpaRepository<Job, Integer> {
-    Job findJobById(Integer id);
+  Job findJobById(Integer id);
 }

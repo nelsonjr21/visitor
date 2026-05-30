@@ -1,11 +1,9 @@
 package com.manage.visitor.model.entity.admin;
 
-import com.manage.visitor.model.dto.admin.RoleDto;
+import java.util.List;
 
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.List;
 
 @Builder
 @Getter

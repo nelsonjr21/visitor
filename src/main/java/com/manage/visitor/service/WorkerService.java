@@ -3,38 +3,36 @@ package com.manage.visitor.service;
 import java.util.List;
 import java.util.Optional;
 
-import com.manage.visitor.model.dto.form.WorkerFormDto;
-import com.manage.visitor.model.entity.Job;
-import com.manage.visitor.model.mapper.JobMapper;
-import com.manage.visitor.model.mapper.WorkerMapper;
-import com.manage.visitor.model.mapper.admin.RoleMapper;
-import com.manage.visitor.repository.admin.RoleRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import com.manage.visitor.helpers.exception.AppException;
 import com.manage.visitor.helpers.exception.BadRequestException;
 import com.manage.visitor.helpers.exception.DataNotFoundException;
 import com.manage.visitor.helpers.http.Message;
 import com.manage.visitor.helpers.security.JwtUtils;
-import com.manage.visitor.model.dto.JobDto;
 import com.manage.visitor.model.dto.WorkerDto;
-import com.manage.visitor.model.dto.admin.RoleDto;
 import com.manage.visitor.model.dto.admin.UserDto;
+import com.manage.visitor.model.dto.form.WorkerFormDto;
+import com.manage.visitor.model.entity.Job;
 import com.manage.visitor.model.entity.Worker;
 import com.manage.visitor.model.entity.admin.Role;
 import com.manage.visitor.model.entity.admin.RoleWorker;
+import com.manage.visitor.model.mapper.JobMapper;
+import com.manage.visitor.model.mapper.WorkerMapper;
+import com.manage.visitor.model.mapper.admin.RoleMapper;
 import com.manage.visitor.repository.JobRepository;
 import com.manage.visitor.repository.WorkerRepository;
+import com.manage.visitor.repository.admin.RoleRepository;
 import com.manage.visitor.repository.admin.RoleWorkerRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.client.HttpClientErrorException;
 
 @Slf4j
 @Service
@@ -50,35 +48,38 @@ public class WorkerService {
   private final RoleRepository roleRepository;
   private final WorkerMapper workerMapper;
   private final JobMapper jobMapper;
-    private final RoleMapper roleMapper;
+  private final RoleMapper roleMapper;
 
-    @Transactional
+  @Transactional
   public WorkerDto save(WorkerFormDto dto) {
     log.info("save worker");
     try {
       Worker data = workerMapper.toEntity(dto);
-        if (repository.findByIdentifier(data.getIdentifier()) != null) {
-          throw new BadRequestException("Username already exists");
-        }
-        data.setPw(passwordEncoder.encode(data.getPw()));
+      if (repository.findByIdentifier(data.getIdentifier()) != null) {
+        throw new BadRequestException("Username already exists");
+      }
+      data.setPw(passwordEncoder.encode(data.getPw()));
 
-        // save
-        Worker saved = repository.save(data);
-        dto.roleList()
-            .forEach(
-                x -> {
-                  roleWorkerRepository.save(
-                          RoleWorker.builder()
-                                  .role(Role.builder().id(x).build())
-                                  .worker(Worker.builder().id(saved.getId()).build())
-                                  .build());
-                });
-        return workerMapper.toDtoWithJobDtoAndRoleDtoList(
-                saved,
-                jobRepository.findJobById(saved.getJob().getId()),
-                roleRepository.findByRoleWorkersWorkerId(saved.getId()) //  on a la liste des rôles en fonctions de worker id
-                        .stream().map(roleMapper::toDto).toList()
-        );
+      // save
+      Worker saved = repository.save(data);
+      dto.roleList()
+          .forEach(
+              x -> {
+                roleWorkerRepository.save(
+                    RoleWorker.builder()
+                        .role(Role.builder().id(x).build())
+                        .worker(Worker.builder().id(saved.getId()).build())
+                        .build());
+              });
+      return workerMapper.toDtoWithJobDtoAndRoleDtoList(
+          saved,
+          jobRepository.findJobById(saved.getJob().getId()),
+          roleRepository
+              .findByRoleWorkersWorkerId(
+                  saved.getId()) //  on a la liste des rôles en fonctions de worker id
+              .stream()
+              .map(roleMapper::toDto)
+              .toList());
     } catch (Exception e) {
       log.error("save worker failed: ", e);
       throw new AppException(e.getMessage());
@@ -96,10 +97,11 @@ public class WorkerService {
         return workerMapper.toDtoWithToken(
             data,
             roleWorkerRepository.findByWorker_Id(data.getId()).stream()
-                .map(y -> {
-                    Optional<Role> role = roleRepository.findById(y.getRole().getId());
-                    return role.map(roleMapper::toDto).orElse(null);
-                })
+                .map(
+                    y -> {
+                      Optional<Role> role = roleRepository.findById(y.getRole().getId());
+                      return role.map(roleMapper::toDto).orElse(null);
+                    })
                 .toList(),
             jobRepository.findById(data.getJob().getId()).map(jobMapper::toDto).orElse(null),
             token);
@@ -120,13 +122,16 @@ public class WorkerService {
       return repository.findAll().stream()
           .map(
               x ->
-                      workerMapper.toDtoWithJobDtoAndRoleDtoList(
+                  workerMapper.toDtoWithJobDtoAndRoleDtoList(
                       x,
                       jobRepository.findJobById(x.getJob().getId()),
-                              roleRepository.findByRoleWorkersWorkerId(x.getId()) //  on a la liste des rôles en fonctions de worker id
-                                      .stream().map(roleMapper::toDto).toList()
-                      )
-          ).toList();
+                      roleRepository
+                          .findByRoleWorkersWorkerId(
+                              x.getId()) //  on a la liste des rôles en fonctions de worker id
+                          .stream()
+                          .map(roleMapper::toDto)
+                          .toList()))
+          .toList();
     } catch (Exception e) {
       log.error("loading worker failed: ", e);
       throw new AppException(e.getMessage());
@@ -140,10 +145,13 @@ public class WorkerService {
       if (data.isPresent()) {
         return workerMapper.toDtoWithJobDtoAndRoleDtoList(
             data.get(),
-                jobRepository.findJobById(data.get().getJob().getId()),
-                roleRepository.findByRoleWorkersWorkerId(data.get().getId()) //  on a la liste des rôles en fonctions de worker id
-                        .stream().map(roleMapper::toDto).toList()
-        );
+            jobRepository.findJobById(data.get().getJob().getId()),
+            roleRepository
+                .findByRoleWorkersWorkerId(
+                    data.get().getId()) //  on a la liste des rôles en fonctions de worker id
+                .stream()
+                .map(roleMapper::toDto)
+                .toList());
       }
     } catch (Exception e) {
       log.error("loading Worker failed : ", e);
@@ -169,19 +177,21 @@ public class WorkerService {
                 x -> {
                   if (roleWorkerRepository.findByRole_IdAndWorker_Id(x, existing.get().getId())) {
                     roleWorkerRepository.save(
-                            RoleWorker.builder()
-                                    .role(Role.builder().id(x).build())
-                                    .worker(Worker.builder().id(existing.get().getId()).build())
-                                    .build()
-                    );
+                        RoleWorker.builder()
+                            .role(Role.builder().id(x).build())
+                            .worker(Worker.builder().id(existing.get().getId()).build())
+                            .build());
                   }
                 });
         return workerMapper.toDtoWithJobDtoAndRoleDtoList(
-                existing.get(),
-                jobRepository.findJobById(existing.get().getJob().getId()),
-                roleRepository.findByRoleWorkersWorkerId(existing.get().getId()) //  on a la liste des rôles en fonctions de worker id
-                        .stream().map(roleMapper::toDto).toList()
-        );
+            existing.get(),
+            jobRepository.findJobById(existing.get().getJob().getId()),
+            roleRepository
+                .findByRoleWorkersWorkerId(
+                    existing.get().getId()) //  on a la liste des rôles en fonctions de worker id
+                .stream()
+                .map(roleMapper::toDto)
+                .toList());
       }
     } catch (Exception e) {
       log.error("update worker failed: ", e);

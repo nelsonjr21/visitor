@@ -2,14 +2,13 @@ package com.manage.visitor.controller;
 
 import java.util.List;
 
-import com.manage.visitor.model.dto.form.WorkerFormDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.manage.visitor.helpers.http.ApiResponse;
 import com.manage.visitor.model.dto.WorkerDto;
 import com.manage.visitor.model.dto.admin.UserDto;
+import com.manage.visitor.model.dto.form.WorkerFormDto;
 import com.manage.visitor.service.WorkerService;
 
 import lombok.RequiredArgsConstructor;
@@ -48,7 +47,8 @@ public class WorkerController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<WorkerDto> update(@PathVariable Integer id, @RequestBody WorkerFormDto dto) {
+  public ResponseEntity<WorkerDto> update(
+      @PathVariable Integer id, @RequestBody WorkerFormDto dto) {
     log.info("HTTP PUT /workers body={}", dto);
     return ResponseEntity.ok(service.update(id, dto));
   }
