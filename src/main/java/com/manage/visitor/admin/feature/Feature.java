@@ -24,7 +24,4 @@ public class Feature {
   public Feature(Integer id) {
     this.id = id;
   }
-
-  public static record FeatureFormDto(String label, String code, Integer idKey, String url) {
-  }
 }
