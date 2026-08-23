@@ -18,7 +18,7 @@ public class Feature {
 
   private String label;
   private String code;
-  private Integer idKey;
+  private Integer keyId;
   private String url;
 
   public Feature(Integer id) {

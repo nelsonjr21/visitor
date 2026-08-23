@@ -9,7 +9,7 @@ import com.manage.visitor.admin.role.RoleFeature;
 
 @Repository
 public interface RoleFeatureRepository extends JpaRepository<RoleFeature, Integer> {
-  List<RoleFeature> findByFeature_IdKey(Integer featureIdKey);
+  List<RoleFeature> findByFeature_KeyId(Integer featureIdKey);
 
   boolean existsByFeature_Id(Integer featureId);
 
