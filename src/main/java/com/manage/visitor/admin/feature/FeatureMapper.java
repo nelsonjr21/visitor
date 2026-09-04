@@ -11,7 +11,7 @@ public class FeatureMapper {
                 data.getId(),
                 data.getLabel(),
                 data.getCode(),
-                data.getIdKey(),
+                data.getKeyId(),
                 data.getUrl());
     }
 
@@ -20,7 +20,7 @@ public class FeatureMapper {
         return Feature.builder()
                 .code(dto.code())
                 .label(dto.label())
-                .idKey(dto.idKey())
+                .keyId(dto.idKey())
                 .url(dto.url())
                 .build();
     }

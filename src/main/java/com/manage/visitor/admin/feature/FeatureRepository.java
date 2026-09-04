@@ -7,9 +7,9 @@ import java.util.List;
 
 @Repository
 public interface FeatureRepository extends JpaRepository<Feature, Integer> {
-    List<Feature> findByIdKeyIsNotNull();
+    List<Feature> findByKeyIdIsNotNull();
 
-    List<Feature> findByIdKey(Integer idKey);
+    List<Feature> findByKeyId(Integer idKey);
 
-    boolean existsByIdKey(Integer idKey);
+    boolean existsByKeyId(Integer idKey);
 }

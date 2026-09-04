@@ -36,7 +36,7 @@ public class FeatureService {
         log.info("save feature");
         if (dto.idKey() != null) {
             // 1.
-            if (!featureRepository.existsByIdKey(dto.idKey())) {
+            if (!featureRepository.existsByKeyId(dto.idKey())) {
                 throw new BadRequestException("feature key not existing");
             }
         }
@@ -46,7 +46,7 @@ public class FeatureService {
             Feature saved = featureRepository.save(featureMapper.toEntity(dto));
             // 2.
             List<RoleFeature> roleWithKeyFeature =
-                    roleFeatureRepository.findByFeature_IdKey(saved.getIdKey());
+                    roleFeatureRepository.findByFeature_KeyId(saved.getKeyId());
             if (!roleWithKeyFeature.isEmpty()) {
                 roleWithKeyFeature.forEach(
                         x -> {
@@ -80,7 +80,7 @@ public class FeatureService {
     public List<FeatureDto> getAllKeyFeature() {
         log.info("loading key feature");
         try {
-            return featureRepository.findByIdKeyIsNotNull().stream().map(featureMapper::toDto).toList();
+            return featureRepository.findByKeyIdIsNotNull().stream().map(featureMapper::toDto).toList();
         } catch (Exception e) {
             log.error("loading key feature failed: ", e);
             throw new AppException(e.getMessage());
@@ -101,7 +101,7 @@ public class FeatureService {
             );
             // after add other feature
             featureRepository
-                    .findByIdKey(idKeyFeature)
+                    .findByKeyId(idKeyFeature)
                     .forEach(
                             x -> {
                                 roleFeatureRepository.save(
@@ -138,7 +138,7 @@ public class FeatureService {
             if (existing.isPresent()) {
                 existing.get().setLabel(dto.label());
                 existing.get().setCode(dto.code());
-                existing.get().setIdKey(dto.idKey());
+                existing.get().setKeyId(dto.idKey());
                 existing.get().setUrl(dto.url());
                 return featureMapper.toDto(featureRepository.save(existing.get()));
             }

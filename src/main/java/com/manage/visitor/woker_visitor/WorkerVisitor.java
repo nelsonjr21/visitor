@@ -22,6 +22,7 @@ public class WorkerVisitor {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
+  @Column
   private LocalDateTime visitDate;
 
   @ManyToOne
